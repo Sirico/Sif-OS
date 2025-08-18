@@ -1,0 +1,25 @@
+name: sif-os
+description: "Custom uBlue image with Tailscale + Remmina out of the box"
+base-image: ghcr.io/ublue-os/base-main
+image-version: latest
+
+modules:
+  # System packages
+  - type: rpm-ostree
+    install:
+      - tailscale
+
+  # Enable Tailscale service on boot
+  - type: systemd
+    system:
+      enabled:
+        - tailscaled.service
+
+  # Flatpaks (system-wide install)
+  - type: flatpak
+    system:
+      install:
+        - org.remmina.Remmina
+    remotes:
+      - remote: flathub
+        url: https://dl.flathub.org/repo/flathub.flatpakrepo
