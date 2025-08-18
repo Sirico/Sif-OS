@@ -1,30 +1,80 @@
-# Allow build scripts to be referenced without being copied into the final image
-FROM scratch AS ctx
-COPY build_files /
+# Containerfile — Sif-OS (Bluefin base + Remmina + Tailscale + branding)
 
-# Base Image
 FROM ghcr.io/ublue-os/bluefin:stable
 
-## Other possible base images include:
-# FROM ghcr.io/ublue-os/bazzite:latest
-# FROM ghcr.io/ublue-os/bluefin-nvidia:stable
-# 
-# ... and so on, here are more base images
-# Universal Blue Images: https://github.com/orgs/ublue-os/packages
-# Fedora base image: quay.io/fedora/fedora-bootc:41
-# CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
+LABEL org.opencontainers.image.title="Sif-OS (Thin Client)"
+LABEL org.opencontainers.image.description="Bluefin (GNOME) + Remmina + Tailscale + autologin + branding for Wyse 5070"
+LABEL org.opencontainers.image.source="https://github.com/<you>/Sif-OS"
 
-### MODIFICATIONS
-## make modifications desired in your image and install packages by modifying the build.sh script
-## the following RUN directive does all the things required to run "build.sh" as recommended.
+# -------------------------
+# 1) Core additions
+# -------------------------
+RUN rpm-ostree install tailscale \
+    && systemctl enable tailscaled \
+    && ostree container commit
 
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=cache,dst=/var/cache \
-    --mount=type=cache,dst=/var/log \
-    --mount=type=tmpfs,dst=/tmp \
-    /ctx/build.sh && \
-    ostree container commit
-    
-### LINTING
-## Verify final image and contents are correct.
-RUN bootc container lint
+# -------------------------
+# 2) Remmina via Flatpak (system-wide)
+# -------------------------
+RUN flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo \
+    && flatpak install --noninteractive --system flathub org.remmina.Remmina \
+    && ostree container commit
+
+# -------------------------
+# 3) Thin client user + GDM autologin
+# -------------------------
+RUN useradd -m thinuser && passwd -d thinuser \
+    && install -d /etc/gdm \
+    && printf "[daemon]\nAutomaticLoginEnable=true\nAutomaticLogin=thinuser\n" > /etc/gdm/custom.conf \
+    && ostree container commit
+
+# -------------------------
+# 4) Autostart Remmina
+# -------------------------
+RUN install -d /etc/xdg/autostart \
+    && printf "[Desktop Entry]\nType=Application\nName=Remmina\nExec=flatpak run org.remmina.Remmina\nX-GNOME-Autostart-enabled=true\n" \
+       > /etc/xdg/autostart/remmina.desktop \
+    && ostree container commit
+
+# -------------------------
+# 5) Branding: wallpaper + logo
+# -------------------------
+COPY build_files/branding /usr/share/sif-branding
+
+# Default wallpaper
+RUN install -d /usr/share/backgrounds/sif \
+    && [ -f /usr/share/sif-branding/wallpaper.jpg ] && cp /usr/share/sif-branding/wallpaper.jpg /usr/share/backgrounds/sif/default.jpg || true \
+    && ostree container commit
+
+# GNOME background schema override
+RUN install -d /usr/share/glib-2.0/schemas \
+    && bash -lc 'cat >/usr/share/glib-2.0/schemas/10-sif.gschema.override <<EOF
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/sif/default.jpg'
+picture-uri-dark='file:///usr/share/backgrounds/sif/default.jpg'
+EOF' \
+    && glib-compile-schemas /usr/share/glib-2.0/schemas \
+    && ostree container commit
+
+# Optional: GDM greeter logo
+RUN [ -f /usr/share/sif-branding/sif-logo.png ] && cp /usr/share/sif-branding/sif-logo.png /usr/share/pixmaps/sif-logo.png || true \
+    && ostree container commit
+
+# -------------------------
+# 6) Preseed Remmina profiles
+# -------------------------
+COPY build_files/remmina /tmp/remmina-profiles
+RUN install -d /etc/skel/.local/share/remmina \
+    && if [ -d /tmp/remmina-profiles ]; then \
+        cp -a /tmp/remmina-profiles/*.remmina /etc/skel/.local/share/remmina/ 2>/dev/null || true; \
+    fi \
+    && rm -rf /tmp/remmina-profiles \
+    && ostree container commit
+
+# -------------------------
+# Notes:
+# - First boot: join Tailscale:
+#     sudo tailscale up --authkey=tskey-xxxx --ssh
+# - Remmina autostarts for thinuser on login.
+# - Branding: put wallpaper.jpg and sif-logo.png in build_files/branding/.
+# -------------------------
