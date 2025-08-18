@@ -1,9 +1,9 @@
-# Containerfile — Sif-OS (Bluefin base + Remmina + Tailscale + branding)
+# Containerfile — Sif-OS (Bluefin base + Remmina + Tailscale + autologin, no branding)
 
 FROM ghcr.io/ublue-os/bluefin:stable
 
 LABEL org.opencontainers.image.title="Sif-OS (Thin Client)"
-LABEL org.opencontainers.image.description="Bluefin (GNOME) + Remmina + Tailscale + autologin + branding for Wyse 5070"
+LABEL org.opencontainers.image.description="Bluefin (GNOME) + Remmina + Tailscale + autologin for Wyse 5070"
 LABEL org.opencontainers.image.source="https://github.com/<you>/Sif-OS"
 
 # -------------------------
@@ -37,32 +37,9 @@ RUN install -d /etc/xdg/autostart \
     && ostree container commit
 
 # -------------------------
-# 5) Branding: wallpaper + logo
+# 5) Preseed Remmina profiles (optional)
 # -------------------------
-COPY build_files/branding /usr/share/sif-branding
-
-# Default wallpaper
-RUN install -d /usr/share/backgrounds/sif \
-    && [ -f /usr/share/sif-branding/wallpaper.jpg ] && cp /usr/share/sif-branding/wallpaper.jpg /usr/share/backgrounds/sif/default.jpg || true \
-    && ostree container commit
-
-# GNOME background schema override
-RUN install -d /usr/share/glib-2.0/schemas \
-    && bash -lc 'cat >/usr/share/glib-2.0/schemas/10-sif.gschema.override <<EOF
-[org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/sif/default.jpg'
-picture-uri-dark='file:///usr/share/backgrounds/sif/default.jpg'
-EOF' \
-    && glib-compile-schemas /usr/share/glib-2.0/schemas \
-    && ostree container commit
-
-# Optional: GDM greeter logo
-RUN [ -f /usr/share/sif-branding/sif-logo.png ] && cp /usr/share/sif-branding/sif-logo.png /usr/share/pixmaps/sif-logo.png || true \
-    && ostree container commit
-
-# -------------------------
-# 6) Preseed Remmina profiles
-# -------------------------
+# If you add *.remmina files under build_files/remmina, they’ll be copied in.
 COPY build_files/remmina /tmp/remmina-profiles
 RUN install -d /etc/skel/.local/share/remmina \
     && if [ -d /tmp/remmina-profiles ]; then \
@@ -73,8 +50,8 @@ RUN install -d /etc/skel/.local/share/remmina \
 
 # -------------------------
 # Notes:
-# - First boot: join Tailscale:
+# - Branding removed (no wallpaper/logo copy).
+# - Add build_files/remmina if you want preseeded connection profiles.
+# - First boot: connect Tailscale:
 #     sudo tailscale up --authkey=tskey-xxxx --ssh
-# - Remmina autostarts for thinuser on login.
-# - Branding: put wallpaper.jpg and sif-logo.png in build_files/branding/.
 # -------------------------
