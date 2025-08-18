@@ -21,16 +21,6 @@ RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flath
  && flatpak install -y --system flathub org.remmina.Remmina org.mozilla.firefox
  
 
-# ----- (Optional) smartcard + Intel media decode for Wyse 5070 -----
-# Uncomment if you want better HW video decode and CAC support out of the box
-RUN rpm-ostree install intel-media-driver libva-utils pcsc-lite ccid opensc \
-&& systemctl enable pcscd.service
-
-# ----- (Optional) GNOME power defaults for thin clients -----
-# If you later add a gschema override, copy it like this:
-COPY files/gschema-overrides/zzz-thinclient.gschema.override /usr/share/glib-2.0/schemas/
-RUN glib-compile-schemas /usr/share/glib-2.0/schemas
-
 # ----- (Optional) theming/assets wiring (leave commented for now) -----
 # COPY files/backgrounds/sif /usr/share/backgrounds/sif
 # COPY files/themes/YourTheme /usr/share/themes/YourTheme
