@@ -18,8 +18,8 @@ RUN systemctl enable tailscaled.service
 
 # ----- Flatpak: add Flathub + install Remmina system-wide -----
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
- && flatpak install -y --system flathub org.remmina.Remmina
- && flatpak install -y --system flathub org.mozilla.firefox
+ && flatpak install -y --system flathub org.remmina.Remmina org.mozilla.firefox
+ 
 
 # ----- (Optional) smartcard + Intel media decode for Wyse 5070 -----
 # Uncomment if you want better HW video decode and CAC support out of the box
