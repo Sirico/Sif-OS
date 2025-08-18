@@ -1,30 +1,38 @@
-# Allow build scripts to be referenced without being copied into the final image
-FROM scratch AS ctx
-COPY build_files /
+# Sif-OS base on a clean uBlue image
+FROM ghcr.io/ublue-os/main:stable
 
-# Base Image
-FROM ghcr.io/ublue-os/base-main:latest
+# ----- metadata (helps force a new ostree commit each build) -----
+ARG IMAGE_VERSION=0.1.0
+LABEL org.opencontainers.image.title="Sif-OS"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
+LABEL org.opencontainers.image.description="uBlue-based thin client image with Tailscale + Remmina"
 
-## Other possible base images include:
-# FROM ghcr.io/ublue-os/bazzite:latest
-# FROM ghcr.io/ublue-os/bluefin-nvidia:stable
-# 
-# ... and so on, here are more base images
-# Universal Blue Images: https://github.com/orgs/ublue-os/packages
-# Fedora base image: quay.io/fedora/fedora-bootc:41
-# CentOS base images: quay.io/centos-bootc/centos-bootc:stream10
+# ----- Tailscale: add official repo + install -----
+# https://pkgs.tailscale.com/stable/fedora/
+RUN curl -fsSL https://pkgs.tailscale.com/stable/fedora/tailscale.repo \
+      -o /etc/yum.repos.d/tailscale.repo \
+ && rpm-ostree install tailscale
 
-### MODIFICATIONS
-## make modifications desired in your image and install packages by modifying the build.sh script
-## the following RUN directive does all the things required to run "build.sh" as recommended.
+# Enable tailscaled on boot (systemd presets get baked into /etc)
+RUN systemctl enable tailscaled.service
 
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=cache,dst=/var/cache \
-    --mount=type=cache,dst=/var/log \
-    --mount=type=tmpfs,dst=/tmp \
-    /ctx/build.sh && \
-    ostree container commit
-    
-### LINTING
-## Verify final image and contents are correct.
-RUN bootc container lint
+# ----- Flatpak: add Flathub + install Remmina system-wide -----
+RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
+ && flatpak install -y --system flathub org.remmina.Remmina
+
+# ----- (Optional) smartcard + Intel media decode for Wyse 5070 -----
+# Uncomment if you want better HW video decode and CAC support out of the box
+# RUN rpm-ostree install intel-media-driver libva-utils pcsc-lite ccid opensc \
+#  && systemctl enable pcscd.service
+
+# ----- (Optional) GNOME power defaults for thin clients -----
+# If you later add a gschema override, copy it like this:
+# COPY files/gschema-overrides/zzz-thinclient.gschema.override /usr/share/glib-2.0/schemas/
+# RUN glib-compile-schemas /usr/share/glib-2.0/schemas
+
+# ----- (Optional) theming/assets wiring (leave commented for now) -----
+# COPY files/backgrounds/sif /usr/share/backgrounds/sif
+# COPY files/themes/YourTheme /usr/share/themes/YourTheme
+# COPY files/icons/YourIconTheme /usr/share/icons/YourIconTheme
+# COPY files/plymouth/sif /usr/share/plymouth/themes/sif
+# RUN sed -i 's/^Theme=.*/Theme=sif/' /etc/plymouth/plymouthd.conf || true
