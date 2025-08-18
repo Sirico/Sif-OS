@@ -16,9 +16,19 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/fedora/tailscale.repo \
 # Enable tailscaled on boot (systemd presets get baked into /etc)
 RUN systemctl enable tailscaled.service
 
+# ----- Remmina via RPMs (system-wide) -----
+# Core app + common plugins (RDP, VNC, SPICE, secret storage)
+RUN rpm-ostree install \
+      remmina \
+      remmina-plugins-rdp \
+      remmina-plugins-vnc \
+      remmina-plugins-spice \
+      remmina-plugins-secret
+
+
 # ----- Flatpak: add Flathub + install Remmina system-wide -----
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
- && flatpak install -y --system flathub org.remmina.Remmina org.mozilla.firefox
+ && flatpak install -y --system org.mozilla.firefox
  
 
 # ----- (Optional) theming/assets wiring (leave commented for now) -----
