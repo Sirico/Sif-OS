@@ -1,0 +1,41 @@
+modules:
+  # 1) System RPMs tuned for thin clients
+  - type: rpm-ostree
+    install:
+      - tailscale                 # remote mgmt
+      - intel-media-driver        # VAAPI for Intel iGPU (UHD 605)
+      - libva-utils               # vainfo for verification
+      - pcsc-lite                 # smart card stack
+      - ccid
+      - opensc
+
+  # 2) Enable key system services
+  - type: systemd
+    system:
+      enabled:
+        - tailscaled.service
+        - pcscd.service
+
+  # 3) NetworkManager defaults: WOL on; avoid Wi-Fi powersave
+  - type: files
+    files:
+      - source: files/nm/10-wol.conf
+        destination: /etc/NetworkManager/conf.d/10-wol.conf
+      - source: files/nm/20-wifi-powersave-off.conf
+        destination: /etc/NetworkManager/conf.d/20-wifi-powersave-off.conf
+
+  # 4) GNOME power defaults: don’t suspend/blank on AC
+  - type: gschema-overrides
+    include:
+      - files/gschema-overrides/zzz-thinclient.gschema.override
+
+  # 5) Flatpaks (system-wide)
+  - type: flatpak
+    system:
+      remotes:
+        - remote: flathub
+          url: https://dl.flathub.org/repo/flathub.flatpakrepo
+      install:
+        - org.remmina.Remmina
+        # Add a browser if your base doesn't include one:
+        - org.mozilla.firefox
