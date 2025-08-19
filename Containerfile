@@ -2,7 +2,7 @@
 FROM ghcr.io/ublue-os/bluefin:latest
 
 # ----- metadata (helps force a new ostree commit each build) -----
-ARG IMAGE_VERSION=0.1.0
+ARG IMAGE_VERSION=0.4.0
 LABEL org.opencontainers.image.title="Sif-OS"
 LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
 LABEL org.opencontainers.image.description="uBlue-based thin client image with Tailscale + Remmina"
