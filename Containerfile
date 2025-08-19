@@ -30,10 +30,11 @@ RUN rpm-ostree install \
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
       && flatpak install -y --system org.mozilla.firefox
 
-# ----- Branding -----
-COPY build_files/branding /usr/share/sif-branding
-RUN rm -rf /usr/share/ublue/branding/* \
-      && cp -r /usr/share/sif-branding/* /usr/share/ublue/branding/
+# make a place for your branding
+RUN mkdir -p /usr/share/ublue/branding
+
+# copy your assets in
+COPY build_files/branding/ /usr/share/ublue/branding/
 
 
 # ----- (Optional) theming/assets wiring (leave commented for now) -----
