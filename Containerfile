@@ -1,4 +1,3 @@
-# Sif-OS base on a clean uBlue image
 FROM ghcr.io/ublue-os/bluefin:latest
 
 # ----- metadata (helps force a new ostree commit each build) -----
@@ -19,6 +18,7 @@ RUN systemctl enable tailscaled.service
 # ----- Remmina via RPMs (system-wide) -----
 # Core app + common plugins (RDP, VNC, SPICE, secret storage)
 RUN rpm-ostree install \
+      firefox \
       remmina \
       remmina-plugins-rdp \
       remmina-plugins-vnc \
@@ -26,15 +26,10 @@ RUN rpm-ostree install \
       remmina-plugins-secret
 
 
-# ----- Flatpak: add Flathub + install Remmina system-wide -----
-RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
-      && flatpak install -y --system org.mozilla.firefox
-
-# make a place for your branding
-RUN mkdir -p /usr/share/ublue/branding
-
-# copy your assets in
-COPY build_files/branding/ /usr/share/ublue/branding/
+# ----- Branding -----
+COPY build_files/branding /usr/share/sif-branding
+RUN rm -rf /usr/share/ublue/branding/* \
+      && cp -r /usr/share/sif-branding/* /usr/share/ublue/branding/
 
 
 # ----- (Optional) theming/assets wiring (leave commented for now) -----
