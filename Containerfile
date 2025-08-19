@@ -1,3 +1,4 @@
+# Sif-OS base on a clean uBlue image
 FROM ghcr.io/ublue-os/bluefin:latest
 
 # ----- metadata (helps force a new ostree commit each build) -----
@@ -26,6 +27,17 @@ RUN rpm-ostree install \
       remmina-plugins-secret
 
 
+# --- Branding (optional) ---
+# Put your files in build_files/branding (e.g. wallpapers/, gdm/, icons/, etc.)
+COPY build_files/branding/ /usr/share/sif-branding/
+
+RUN set -eux \
+      && dest="/usr/share/ublue/branding" \
+      && mkdir -p "$dest" \
+      # 'rm -rf /path/*' errors if the dir didn't exist / glob doesn't expand; tolerate it:
+      && rm -rf "$dest"/* 2>/dev/null || true \
+      # copy contents (dot keeps hidden files), preserve attrs:
+      && cp -a /usr/share/sif-branding/. "$dest"/
 # ----- Branding -----
 COPY build_files/branding /usr/share/sif-branding
 RUN rm -rf /usr/share/ublue/branding/* \
