@@ -1,5 +1,5 @@
 # Sif-OS base on a clean uBlue image
-FROM ghcr.io/ublue-os/silverblue-main:latest
+FROM ghcr.io/ublue-os/bluefin:latest
 
 # ----- metadata (helps force a new ostree commit each build) -----
 ARG IMAGE_VERSION=0.1.0
