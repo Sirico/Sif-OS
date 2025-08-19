@@ -80,37 +80,5 @@ logo='/usr/share/pixmaps/sif-os.png'
 # banner-message-text='Welcome to Sif-OS'
 EOF
   dconf update || true
-# --- Plymouth: clone spinner -> sif and swap logo ---
-RUN set -eux; \
-  base=/usr/share/plymouth/themes; \
-  # clone Fedora's spinner theme as our own
-  cp -a "$base/spinner" "$base/sif"; \
-  # fix the theme file to point at our new dir
-  sed -e 's/^Name=.*/Name=Sif OS/' \
-      -e 's#/usr/share/plymouth/themes/spinner#/usr/share/plymouth/themes/sif#g' \
-      "$base/spinner/spinner.plymouth" > "$base/sif/sif.plymouth"
 
-# Put your logo in place as the spinner watermark (the logo the theme shows)
-# Tip: a ~128–256 px square PNG works well.
-COPY build_files/branding/logos/sif-os.png /usr/share/plymouth/themes/sif/watermark.png
-
-# Make Sif the default plymouth theme; allow this to no-op during image build
-RUN sed -i 's/^Theme=.*/Theme=sif/' /etc/plymouth/plymouthd.conf || \
-    (echo -e "[Daemon]\nTheme=sif\n" > /etc/plymouth/plymouthd.conf); \
-    (plymouth-set-default-theme -R sif || true)
-
-# One-shot: rebuild initramfs on first boot so the theme actually applies
-RUN cat >/usr/lib/systemd/system/sif-plymouth-initramfs.service <<'EOF'
-[Unit]
-Description=Rebuild initramfs once to apply Sif Plymouth theme
-ConditionPathExists=!/var/lib/sif/plymouth-initramfs.done
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/sh -c 'plymouth-set-default-theme -R sif || /usr/bin/dracut -f; mkdir -p /var/lib/sif; touch /var/lib/sif/plymouth-initramfs.done'
-
-[Install]
-WantedBy=multi-user.target
-EOF
-RUN systemctl enable sif-plymouth-initramfs.service
 
