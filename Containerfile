@@ -52,33 +52,13 @@ RUN rm -rf /usr/share/ublue/branding/* \
 # RUN sed -i 's/^Theme=.*/Theme=sif/' /etc/plymouth/plymouthd.conf || true
 
 #####changes 0.5.0
-# --- Appearance defaults: dark + yellow accent ---
-RUN mkdir -p /usr/share/glib-2.0/schemas
-RUN cat > /usr/share/glib-2.0/schemas/90_sif-appearance.gschema.override <<'EOF'
-[org.gnome.desktop.interface]
-color-scheme='prefer-dark'
-accent-color='yellow'
-EOF
-
-# Make the overrides take effect
+# GNOME defaults (dark + yellow)
+COPY build_files/schemas/ /usr/share/glib-2.0/schemas/
 RUN glib-compile-schemas /usr/share/glib-2.0/schemas
 
-# --- GDM greeter logo ---
-# Copy your logo into a stable, system path
-COPY build_files/branding/logos/sif-os.png /usr/share/pixmaps/sif-os.png
+# dconf defaults + locks (+ GDM, if those files exist)
+COPY build_files/dconf/ /etc/dconf/
+RUN dconf update || true
 
-# Tell GDM to use it
-RUN set -eux; \
-  mkdir -p /etc/dconf/profile /etc/dconf/db/gdm.d; \
-  # Ensure the gdm dconf profile exists (safe if it already does)
-  printf "user-db:user\nsystem-db:gdm\nfile-db:/usr/share/gdm/greeter-dconf-defaults\n" > /etc/dconf/profile/gdm; \
-  cat > /etc/dconf/db/gdm.d/01-sif-logo <<'EOF'
-[org/gnome/login-screen]
-logo='/usr/share/pixmaps/sif-os.png'
-# Optional banner text:
-# banner-message-enable=true
-# banner-message-text='Welcome to Sif-OS'
-EOF
-  dconf update || true
 
 
