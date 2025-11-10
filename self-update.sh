@@ -75,6 +75,8 @@ cp configuration.nix machine-config.nix self-update.sh /etc/nixos/
 cp -r modules/* /etc/nixos/modules/
 cp -r machines/* /etc/nixos/machines/ 2>/dev/null || true
 cp -r machine-types/* /etc/nixos/machine-types/ 2>/dev/null || true
+cp -r branding/* /etc/nixos/branding/ 2>/dev/null || true
+cp -r branding/* /etc/sifos/branding/ 2>/dev/null || true
 cp -r remmina-profiles/* /etc/nixos/remmina-profiles/ 2>/dev/null || true
 cp -r remmina-profiles/* /etc/sifos/remmina-profiles/ 2>/dev/null || true
 
