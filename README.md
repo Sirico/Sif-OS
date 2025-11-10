@@ -20,9 +20,41 @@ Primary target: **Dell Wyse 5070 Thin Client**
 
 ## Quick Start
 
-### 1. Initial Setup
+**👉 For daily operations, see [FLEET-MANAGEMENT.md](FLEET-MANAGEMENT.md) or [CHEATSHEET.md](CHEATSHEET.md)**
 
-Copy the configuration to a NixOS installation:
+### Deploy Your First Machine
+
+```bash
+# Interactive deployment (prompts for hostname and type)
+./remote-deploy.sh -t 192.168.0.49
+
+# Or specify everything
+./remote-deploy.sh -t 192.168.0.49 -h dispatch-01 -m thin-client -y -a
+```
+
+### Make Configuration Changes
+
+```bash
+# 1. Edit files
+vim modules/users.nix
+
+# 2. Test on one machine
+./remote-deploy.sh -t 192.168.0.49 -h test -m thin-client -y
+
+# 3. Commit and push
+git add .
+git commit -m "Added new user"
+git push
+
+# 4. Deploy to fleet
+./deploy-fleet.sh -a
+```
+
+See [FLEET-MANAGEMENT.md](FLEET-MANAGEMENT.md) for complete workflow.
+
+### Original Setup (First Time Only)
+
+For the initial NixOS installation on new hardware:
 
 ```bash
 # Copy configuration to target machine

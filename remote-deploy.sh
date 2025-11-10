@@ -163,17 +163,38 @@ ssh -o ServerAliveInterval=60 "$REMOTE_USER@$REMOTE_HOST" bash << EOF
     
     # Update hostname and machine type in machine-config.nix
     sed -i 's/networking.hostName = ".*"/networking.hostName = "sifos-$HOSTNAME"/' machine-config.nix
-    sed -i "s|# Options: .*|# Options: thin-client, office, workstation, shop-kiosk, custom\\n  # Current: $MACHINE_TYPE (set $(date +%Y-%m-%d))|" machine-config.nix
+    sed -i "s|# Current: .* (set .*)|# Current: $MACHINE_TYPE (set $(date +%Y-%m-%d))|" machine-config.nix
+    
+    # Update machine-type import based on selection
+    case "$MACHINE_TYPE" in
+        thin-client)
+            sed -i 's|./machine-types/.*\.nix|./machine-types/thin-client.nix|' machine-config.nix
+            ;;
+        office)
+            sed -i 's|./machine-types/.*\.nix|./machine-types/office.nix|' machine-config.nix
+            ;;
+        workstation)
+            sed -i 's|./machine-types/.*\.nix|./machine-types/workstation.nix|' machine-config.nix
+            ;;
+        shop-kiosk)
+            sed -i 's|./machine-types/.*\.nix|./machine-types/shop-kiosk.nix|' machine-config.nix
+            ;;
+        custom)
+            # For custom, comment out the import line
+            sed -i 's|.*./machine-types/.*\.nix|    # ./machine-types/thin-client.nix|' machine-config.nix
+            ;;
+    esac
     
     # Backup existing configuration
     sudo cp -r /etc/nixos /etc/nixos.backup.\$(date +%Y%m%d-%H%M%S) 2>/dev/null || true
     
     # Copy new configuration (preserve existing hardware-configuration.nix)
     echo "Copying configuration to /etc/nixos..."
-    sudo mkdir -p /etc/nixos/modules /etc/nixos/machines /etc/nixos/remmina-profiles /etc/sifos/remmina-profiles
+    sudo mkdir -p /etc/nixos/modules /etc/nixos/machines /etc/nixos/machine-types /etc/nixos/remmina-profiles /etc/sifos/remmina-profiles
     sudo cp configuration.nix machine-config.nix self-update.sh /etc/nixos/
     sudo cp -r modules/* /etc/nixos/modules/
     sudo cp -r machines/* /etc/nixos/machines/ 2>/dev/null || true
+    sudo cp -r machine-types/* /etc/nixos/machine-types/ 2>/dev/null || true
     sudo cp -r remmina-profiles/* /etc/nixos/remmina-profiles/ 2>/dev/null || true
     sudo cp -r remmina-profiles/* /etc/sifos/remmina-profiles/ 2>/dev/null || true
     

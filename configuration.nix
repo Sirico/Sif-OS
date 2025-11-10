@@ -9,11 +9,10 @@
     [ 
       ./nixos/hardware-configuration.nix
       ./modules/users.nix
-      ./modules/thin-client.nix
       ./modules/remote-access.nix
       ./modules/printing.nix
       ./modules/remmina.nix
-      # Machine-specific config (hostname, etc.)
+      # Machine-specific config (hostname and machine type module)
       ./machine-config.nix
     ];
 

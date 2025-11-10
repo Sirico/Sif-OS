@@ -9,7 +9,43 @@ SifOS uses a **GitHub-centric deployment model** where:
 
 This ensures all machines get the same configuration and you have full audit trail.
 
-## 🔄 Daily Workflow
+## � Quick Start: Setting Up Your First Machine
+
+```bash
+# 1. Deploy from your workstation (interactive)
+./remote-deploy.sh -t 192.168.0.49
+# Enter hostname: dispatch-01
+# Select type: 1 (thin-client)
+# Confirm: y
+
+# 2. After test succeeds, apply it
+./remote-deploy.sh -t 192.168.0.49 -h dispatch-01 -m thin-client -y -a
+
+# 3. SSH to machine and set up Tailscale
+ssh admin@192.168.0.49
+sudo tailscale up
+```
+
+That's it! Your machine is ready. 🎉
+
+## ✅ Checking Everything Works
+
+```bash
+# Check machine status
+./check-status.sh 192.168.0.49
+
+# SSH and verify services
+ssh admin@192.168.0.49
+systemctl status sshd      # SSH working?
+systemctl status gdm       # Desktop running?
+systemctl status cups      # Printing ready?
+hostname                   # Correct name?
+
+# Test Remmina (as sif user)
+# Login to desktop and launch Remmina from apps
+```
+
+## �🔄 Daily Workflow
 
 ### Making Changes
 
