@@ -67,6 +67,21 @@
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
+  # Auto-start Remmina on login for the sif user
+  systemd.user.services.remmina-autostart = {
+    description = "Auto-start Remmina RDP client";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.remmina}/bin/remmina";
+      Restart = "no";
+    };
+  };
+
+  # Enable the service for the sif user
+  systemd.user.services.remmina-autostart.enable = true;
+
   # Enable automatic updates (optional - can be disabled for stability)
   system.autoUpgrade = {
     enable = false;  # Set to true if you want automatic updates
