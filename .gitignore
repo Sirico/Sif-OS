@@ -1,0 +1,26 @@
+# NixOS
+result
+result-*
+
+# Hardware configurations (machine-specific)
+nixos/hardware-configuration.nix
+
+# Secrets
+*.key
+*.pem
+secrets/
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+.DS_Store

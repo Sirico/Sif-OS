@@ -1,0 +1,73 @@
+# User Configuration Module
+# Defines standard users for SifOS thin clients
+
+{ config, pkgs, ... }:
+
+{
+  # Define users
+  users.users = {
+    # Admin user (Darren) - for remote management
+    admin = {
+      isNormalUser = true;
+      description = "Administrator";
+      extraGroups = [ 
+        "networkmanager" 
+        "wheel"           # sudo access
+        "lp"              # printer access
+        "audio"
+        "video"
+      ];
+      # Add your SSH public key here for passwordless access
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIISILWvOua7RNEwVElEPYd7xSJoO7JB2J5HRZg/4r1ze darrenjgregory@gmail.com"
+      ];
+      packages = with pkgs; [
+        # Admin tools
+        vim
+        htop
+        tmux
+        git
+      ];
+    };
+
+    # Standard user (sif) - for thin client operations
+    sif = {
+      isNormalUser = true;
+      description = "SIF User";
+      extraGroups = [ 
+        "networkmanager"
+        "lp"              # printer access
+        "audio"
+        "video"
+      ];
+      # Auto-login for thin client convenience
+      initialPassword = "sif2024";
+      packages = with pkgs; [
+        # User tools (minimal)
+      ];
+    };
+  };
+
+  # Enable automatic login for sif user (thin client mode)
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "sif";
+  };
+
+  # Workaround for GNOME autologin
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
+
+  # Security: Allow wheel group to use sudo without password for admin
+  security.sudo.extraRules = [
+    {
+      users = [ "admin" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+}
