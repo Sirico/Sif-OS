@@ -1,0 +1,36 @@
+# Remmina RDP Connection Profile
+# Template for Windows VM connections
+
+[remmina]
+name=Windows VM - Proxmox
+protocol=RDP
+server=192.168.1.100:3389
+username=
+password=
+domain=
+resolution_mode=1
+resolution_width=1920
+resolution_height=1080
+color_depth=32
+network_connection_type=3
+audio_output_mode=0
+console=0
+security=negotiate
+gateway_server=
+gateway_username=
+gateway_domain=
+gateway_password=
+cert_ignore=1
+old-license=false
+scale=1
+drive=
+printer=1
+sound=local
+ssh_tunnel_enabled=0
+ssh_tunnel_server=
+ssh_tunnel_auth=0
+ssh_tunnel_username=
+ssh_tunnel_privatekey=
+ssh_tunnel_passphrase=
+window_maximize=1
+viewmode=1

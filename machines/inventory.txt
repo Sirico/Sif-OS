@@ -1,0 +1,10 @@
+# SifOS Fleet Inventory
+# Format: hostname:ip:type:description
+# Type options: thin-client, office, workstation, shop-kiosk, custom
+
+# Example entries (uncomment and edit):
+# dispatch-01:192.168.0.49:thin-client:Dispatch Station 1 - Main Office
+# dispatch-02:192.168.0.50:thin-client:Dispatch Station 2 - Warehouse
+# office-pc-1:192.168.0.60:office:Manager Office
+# dev-workstation:192.168.0.70:workstation:Development Lab
+# shop-kiosk-1:192.168.0.80:shop-kiosk:Shop Floor Terminal

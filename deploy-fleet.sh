@@ -12,26 +12,31 @@ NC='\033[0m'
 INVENTORY_FILE="machines/inventory.txt"
 APPLY=false
 PARALLEL=false
+MACHINE_TYPE=""
 
 usage() {
-    echo "Usage: $0 [-a] [-p] [-f <inventory-file>]"
+    echo "Usage: $0 [-a] [-p] [-m <machine-type>] [-f <inventory-file>]"
     echo "  -a: Apply immediately (default: test only)"
     echo "  -p: Deploy in parallel (faster but harder to debug)"
+    echo "  -m: Machine type for all machines (default: prompt per machine)"
     echo "  -f: Inventory file (default: machines/inventory.txt)"
     echo ""
     echo "Inventory file format (one per line):"
-    echo "  hostname:ip:description"
+    echo "  hostname:ip:type:description"
     echo "Example:"
-    echo "  dispatch-01:192.168.0.49:Office A"
-    echo "  dispatch-02:192.168.0.50:Office B"
+    echo "  dispatch-01:192.168.0.49:thin-client:Office A"
+    echo "  office-pc-1:192.168.0.50:office:Main Office"
+    echo ""
+    echo "If type is omitted in inventory, uses -m option or prompts"
     exit 1
 }
 
 # Parse arguments
-while getopts "apf:" opt; do
+while getopts "apm:f:" opt; do
     case $opt in
         a) APPLY=true ;;
         p) PARALLEL=true ;;
+        m) MACHINE_TYPE="$OPTARG" ;;
         f) INVENTORY_FILE="$OPTARG" ;;
         *) usage ;;
     esac
@@ -69,11 +74,17 @@ deploy_one() {
     local line=$1
     local hostname=$(echo "$line" | cut -d: -f1)
     local ip=$(echo "$line" | cut -d: -f2)
-    local desc=$(echo "$line" | cut -d: -f3)
+    local type=$(echo "$line" | cut -d: -f3)
+    local desc=$(echo "$line" | cut -d: -f4)
     
-    echo -e "${YELLOW}[$hostname]${NC} Deploying to $ip ($desc)..."
+    # Use machine type from inventory, command line, or default
+    if [ -z "$type" ] || [ "$type" = "$desc" ]; then
+        type="${MACHINE_TYPE:-thin-client}"
+    fi
     
-    local args="-t $ip -h $hostname"
+    echo -e "${YELLOW}[$hostname]${NC} Deploying to $ip ($desc) as $type..."
+    
+    local args="-t $ip -h $hostname -m $type -y"
     [ "$APPLY" = true ] && args="$args -a"
     
     if ./remote-deploy.sh $args 2>&1 | sed "s/^/[$hostname] /"; then

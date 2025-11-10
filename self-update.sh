@@ -60,8 +60,8 @@ fi
 
 cd /tmp/sifos-update
 
-# Preserve hostname
-sed -i "s/networking.hostName = \".*\"/networking.hostName = \"$CURRENT_HOSTNAME\"/" configuration.nix
+# Preserve hostname in machine-config.nix
+sed -i "s/networking.hostName = \".*\"/networking.hostName = \"$CURRENT_HOSTNAME\"/" machine-config.nix
 
 # Backup existing configuration
 BACKUP_DIR="/etc/nixos.backup.$(date +%Y%m%d-%H%M%S)"
@@ -71,9 +71,10 @@ echo -e "${GREEN}✓ Backup created${NC}"
 
 # Copy new configuration (preserve hardware-configuration.nix)
 echo -e "${YELLOW}Installing new configuration...${NC}"
-cp configuration.nix /etc/nixos/
+cp configuration.nix machine-config.nix /etc/nixos/
 cp -r modules/* /etc/nixos/modules/
 cp -r machines/* /etc/nixos/machines/ 2>/dev/null || true
+cp -r remmina-profiles/* /etc/sifos/remmina-profiles/ 2>/dev/null || true
 
 echo -e "${GREEN}✓ Configuration installed${NC}"
 echo ""

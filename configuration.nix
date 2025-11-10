@@ -13,12 +13,12 @@
       ./modules/remote-access.nix
       ./modules/printing.nix
       ./modules/remmina.nix
-      # Optional: Per-machine configuration
-      # ./machines/dispatch-01.nix
+      # Machine-specific config (hostname, etc.)
+      ./machine-config.nix
     ];
 
   # System Identity
-  networking.hostName = "sifos-thinclient"; # Will be overridden per-machine
+  # Note: hostname is set in machine-config.nix per-machine
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;

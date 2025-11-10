@@ -5,10 +5,15 @@ result-*
 # Hardware configurations (machine-specific)
 nixos/hardware-configuration.nix
 
+# Local machine config overrides (keep template tracked)
+# machine-config.nix is tracked as template
+
 # Secrets
 *.key
 *.pem
 secrets/
+# Don't commit passwords in Remmina profiles!
+*.remmina.secret
 
 # Backup files
 *.backup
