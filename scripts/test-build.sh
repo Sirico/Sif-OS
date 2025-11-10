@@ -17,7 +17,8 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$REPO_DIR"
 
 # Create temporary test directory
 TEST_DIR=$(mktemp -d)
@@ -78,7 +79,7 @@ for type_config in "${TYPES[@]}"; do
     fi
     
     # Clean up test directory for next test
-    cd "$SCRIPT_DIR"
+    cd "$REPO_DIR"
     rm -rf "$TEST_DIR" || true
     TEST_DIR=$(mktemp -d) || true
     
