@@ -1,22 +1,30 @@
-# SifOS - Thin Client Operating System
+# SifOS - Multi-Purpose NixOS System
 
-A NixOS-based operating system designed for thin client deployments on Wyse 5070 hardware and similar devices.
+A NixOS-based operating system designed for thin clients, office workstations, kiosks, and servers. Built for remote management and standardized deployments.
 
 ## Purpose
 
-SifOS provides a standardized, remotely-manageable thin client environment for dispatch stations and similar use cases. It includes:
+SifOS provides standardized, remotely-manageable system configurations for various use cases:
 
-- **RDP Access**: Remmina for connecting to Windows VMs in Proxmox
+- **Thin Clients**: RDP stations with Remmina, auto-login, and minimal desktop
+- **Office Workstations**: Full productivity environment with LibreOffice, development tools
+- **Shop Kiosks**: Locked-down single-purpose terminals
+- **Servers**: Headless systems with Cockpit, Podman, and web hosting capabilities
+- **Development Workstations**: Full dev environment with multiple language support
+
+### Key Features
+- **Company Branding**: Dark theme with yellow accents, custom wallpapers and logos
+- **Auto-login**: Thin clients boot directly to sif user with Remmina ready
+- **Remote Management**: SSH and Tailscale VPN for secure remote access
+- **Automated Backups**: Restic backup system for user data and application state
 - **Label Printing**: CUPS with label printer support
-- **Remote Management**: SSH and Tailscale for secure remote access
-- **Standardized Users**: Admin and sif user accounts
-- **Auto-login**: Automatic login to sif user for thin client operation
 
 ## Hardware
 
-Primary target: **Dell Wyse 5070 Thin Client**
-- Intel CPU support
-- Works on similar x86_64 thin client hardware
+Works on x86_64 hardware including:
+- **Dell Wyse 5070 Thin Clients** (primary thin client target)
+- **Dell OptiPlex 5070** (server configurations)
+- **Standard x86_64 PCs** (office and workstation configurations)
 
 ## Quick Start
 
@@ -70,16 +78,26 @@ sifos/
 ├── machine-config.nix             # Per-machine settings (hostname, type)
 │
 ├── modules/                       # Core system modules
-│   ├── users.nix                  # Admin and sif user accounts
+│   ├── users.nix                  # Admin and sif user accounts with keyring setup
 │   ├── remote-access.nix          # SSH and Tailscale VPN
 │   ├── printing.nix               # CUPS printing system
-│   └── remmina.nix                # RDP client configuration
+│   ├── branding.nix               # Company branding (dark theme, yellow accents)
+│   └── backup.nix                 # Restic backup configuration
 │
 ├── machine-types/                 # Machine type-specific configs
-│   ├── thin-client.nix            # Minimal RDP desktop
+│   ├── thin-client.nix            # Minimal RDP desktop with Remmina auto-start
 │   ├── office.nix                 # Full productivity desktop
 │   ├── workstation.nix            # Development environment
-│   └── shop-kiosk.nix             # Locked-down kiosk
+│   ├── shop-kiosk.nix             # Locked-down kiosk
+│   ├── server.nix                 # Headless server with Cockpit and Podman
+│   └── custom.nix                 # Template for custom configurations
+│
+├── branding/                      # Company assets
+│   ├── company-logo.png           # Company logo (100x100)
+│   ├── plymouth-logo.png          # Boot splash logo
+│   ├── user-icon.png              # User account icon
+│   ├── wallpaper.jpg              # Desktop wallpaper
+│   └── login-background.jpg       # Login screen background
 │
 ├── machines/                      # Fleet inventory
 │   ├── inventory.txt              # List of all machines
@@ -104,7 +122,9 @@ sifos/
 │   ├── TESTING.md                 # Testing procedures
 │   ├── CHEATSHEET.md              # Command reference
 │   ├── SECURITY.md                # Security model
-│   └── PROJECT-SUMMARY.md         # Project overview
+│   ├── PROJECT-SUMMARY.md         # Project overview
+│   └── machine-types/             # Machine type documentation
+│       └── server.md              # Server configuration guide
 │
 ├── remote-deploy.sh               # Main deployment script
 └── self-update.sh                 # On-machine update script
@@ -132,10 +152,26 @@ sifos/
 
 ### Thin Client Features
 
-- **Remmina**: RDP client for Windows VM connections
-- **GNOME**: Desktop environment (minimal installation)
-- **Auto-login**: Boots directly to sif user session
+- **Remmina**: Auto-starts on login for immediate RDP access
+- **GNOME**: Dark theme with yellow accents, custom branding
+- **Auto-login**: Boots directly to sif user session with keyring unlocked
 - **No sleep**: Suspend/hibernate disabled
+- **Company Branding**: Custom logos, wallpapers, and login backgrounds
+
+### Office/Workstation Features
+
+- **Full Desktop**: Complete GNOME environment with productivity tools
+- **LibreOffice**: Complete office suite
+- **Development Tools**: Git, VSCode, language runtimes
+- **Multimedia**: Audio/video support
+
+### Server Features
+
+- **Cockpit**: Web management interface on port 9090
+- **Podman**: Container runtime with Docker compatibility
+- **Nginx**: Pre-configured reverse proxy
+- **Monitoring**: Prometheus node exporter
+- **Performance Tuned**: Optimized for server workloads
 
 ### Printing
 
@@ -175,6 +211,69 @@ sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 # Rollback
 sudo nixos-rebuild switch --rollback
 ```
+
+## Backup Strategy
+
+### Configuration Backups (Automatic via Git)
+
+Your NixOS configuration is automatically backed up to GitHub:
+- Repository: `github.com/Sirico/sif-os`
+- Every change is version controlled
+- Easy to restore: just clone and deploy
+
+### User Data Backups (Restic)
+
+The backup module provides automated backups of:
+- `/home/sif/` - User files, Remmina profiles, browser bookmarks
+- `/home/admin/` - Admin user data
+- `/var/lib/` - Application data and state
+
+#### Enable Backups on a Machine
+
+Add to your machine's configuration:
+
+```nix
+{
+  imports = [
+    ./modules/backup.nix
+  ];
+
+  sifos.backup = {
+    enable = true;
+    repository = "/mnt/backup";  # or "s3:s3.amazonaws.com/bucket"
+    passwordFile = "/root/restic-password";
+    schedule = "daily";  # or "weekly", "hourly", etc.
+  };
+}
+```
+
+#### Manual Backup Operations
+
+```bash
+# Run backup now
+sudo sifos-backup
+
+# List available snapshots
+restic -r /mnt/backup -p /root/restic-password snapshots
+
+# Restore a snapshot
+sudo sifos-restore <snapshot-id> /tmp/restore
+
+# Example: Restore user's home directory
+sudo sifos-restore abc123 /tmp/restore
+```
+
+#### Setup Backup Repository
+
+```bash
+# Create password file (do this once per machine)
+echo "your-secure-password" | sudo tee /root/restic-password
+sudo chmod 600 /root/restic-password
+
+# The repository will be initialized automatically on first backup
+```
+
+See [modules/backup.nix](modules/backup.nix) for advanced configuration options.
 
 ## Deployment Notes
 
