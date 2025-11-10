@@ -63,47 +63,46 @@
       source = ../branding/user-icon.png;
       mode = "0644";
     };
+    
+    # GNOME appearance settings (applied system-wide)
+    "dconf/db/local.d/01-appearance" = {
+      text = ''
+        # Dark mode with yellow accents
+        [org/gnome/desktop/interface]
+        color-scheme='prefer-dark'
+        gtk-theme='Adwaita-dark'
+        icon-theme='Adwaita'
+        cursor-theme='Adwaita'
+        accent-color='yellow'
+        
+        # Wallpaper
+        [org/gnome/desktop/background]
+        picture-uri='file:///etc/sifos/branding/wallpaper.jpg'
+        picture-uri-dark='file:///etc/sifos/branding/wallpaper.jpg'
+        picture-options='zoom'
+        primary-color='#FDB714'
+        secondary-color='#000000'
+        
+        # Lock screen wallpaper
+        [org/gnome/desktop/screensaver]
+        picture-uri='file:///etc/sifos/branding/login-background.jpg'
+        primary-color='#FDB714'
+        secondary-color='#000000'
+        
+        # Shell theme (panel, overview)
+        [org/gnome/shell]
+        favorite-apps=['firefox.desktop', 'org.remmina.Remmina.desktop', 'org.gnome.Nautilus.desktop']
+        
+        # Window manager preferences
+        [org/gnome/desktop/wm/preferences]
+        theme='Adwaita-dark'
+        button-layout='appmenu:minimize,maximize,close'
+      '';
+    };
   };
 
-  # Set default wallpaper for all users
-  # This creates a dconf profile that sets the wallpaper
+  # Enable dconf for GNOME settings management
   programs.dconf.enable = true;
-  
-  # GNOME appearance settings (applied system-wide)
-  environment.etc."dconf/db/local.d/01-appearance" = {
-    text = ''
-      # Dark mode with yellow accents
-      [org/gnome/desktop/interface]
-      color-scheme='prefer-dark'
-      gtk-theme='Adwaita-dark'
-      icon-theme='Adwaita'
-      cursor-theme='Adwaita'
-      accent-color='yellow'
-      
-      # Wallpaper
-      [org/gnome/desktop/background]
-      picture-uri='file:///etc/sifos/branding/wallpaper.jpg'
-      picture-uri-dark='file:///etc/sifos/branding/wallpaper.jpg'
-      picture-options='zoom'
-      primary-color='#FDB714'
-      secondary-color='#000000'
-      
-      # Lock screen wallpaper
-      [org/gnome/desktop/screensaver]
-      picture-uri='file:///etc/sifos/branding/login-background.jpg'
-      primary-color='#FDB714'
-      secondary-color='#000000'
-      
-      # Shell theme (panel, overview)
-      [org/gnome/shell]
-      favorite-apps=['firefox.desktop', 'org.remmina.Remmina.desktop', 'org.gnome.Nautilus.desktop']
-      
-      # Window manager preferences
-      [org/gnome/desktop/wm/preferences]
-      theme='Adwaita-dark'
-      button-layout='appmenu:minimize,maximize,close'
-    '';
-  };
 
   # Apply dconf settings
   system.activationScripts.dconf-update = ''
