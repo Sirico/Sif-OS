@@ -66,13 +66,25 @@
   # Automatically unlock GNOME Keyring on auto-login
   # This prevents keyring password prompts for the auto-logged-in user
   security.pam.services.gdm.enableGnomeKeyring = true;
-  security.pam.services.gdm-autologin.text = ''
-    auth     required  pam_succeed_if.so user ingroup users
-    auth     optional  pam_gnome_keyring.so
-    account  include   gdm
-    password include   gdm
-    session  include   gdm
-    session  optional  pam_gnome_keyring.so auto_start
+  security.pam.services.gdm-autologin = {
+    enableGnomeKeyring = true;
+    text = ''
+      auth     required  pam_succeed_if.so user ingroup users
+      auth     optional  pam_gnome_keyring.so
+      account  include   gdm
+      password include   gdm
+      session  include   gdm
+      session  optional  pam_gnome_keyring.so auto_start
+    '';
+  };
+
+  # One-time cleanup: Remove any existing keyring with password
+  # This allows auto-login to create a new keyring with blank password
+  system.activationScripts.cleanupKeyring = ''
+    if [ -d /home/sif/.local/share/keyrings ]; then
+      rm -f /home/sif/.local/share/keyrings/login.keyring
+      rm -f /home/sif/.local/share/keyrings/*.keyring
+    fi
   '';
 
   # Security: Allow wheel group to use sudo without password for admin
