@@ -63,6 +63,7 @@ TYPES=(
     "office:./machine-types/office.nix"
     "workstation:./machine-types/workstation.nix"
     "shop-kiosk:./machine-types/shop-kiosk.nix"
+    "server:./machine-types/server.nix"
     "custom:none"
 )
 
