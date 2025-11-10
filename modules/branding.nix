@@ -103,9 +103,11 @@
     }];
   };
 
-  # Apply dconf settings
-  system.activationScripts.dconf-update = ''
-    ${pkgs.dconf}/bin/dconf update
+  # Apply dconf settings (ensure directory exists first)
+  system.activationScripts.dconf-update = lib.stringAfter ["etc"] ''
+    if [ -d /etc/dconf/db ]; then
+      ${pkgs.dconf}/bin/dconf update
+    fi
   '';
 
   # Set user face/icon for both users
