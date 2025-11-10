@@ -12,6 +12,8 @@
       ./modules/remote-access.nix
       ./modules/printing.nix
       ./modules/remmina.nix
+      # Company branding (dark theme with yellow accents)
+      ./modules/branding.nix
       # Machine-specific config (hostname and machine type module)
       ./machine-config.nix
     ];
