@@ -44,8 +44,9 @@
         "audio"
         "video"
       ];
-      # Auto-login for thin client convenience
-      initialPassword = "sif2024";
+      # Set password for screen unlock (auto-login still works)
+      # Password: sif2024
+      hashedPassword = "$6$uReu0dzjHvqZowpe$lVWGmB45OlIUwamOatkm7Ak57nC.qu.6NOV.T66LTlvZMJofJjyayyvKaiYkNCncb.5I2UUXJTqdu9s25bZrM/";
       packages = with pkgs; [
         # User tools (minimal)
       ];
