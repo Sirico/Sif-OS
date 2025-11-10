@@ -64,7 +64,14 @@
       mode = "0644";
     };
     
-    # GNOME appearance settings (applied system-wide)
+    # GNOME appearance settings (applied system-wide via dconf profile)
+    "dconf/profile/user" = {
+      text = ''
+        user-db:user
+        system-db:local
+      '';
+    };
+    
     "dconf/db/local.d/01-appearance" = {
       text = ''
         # Dark mode with yellow accents
