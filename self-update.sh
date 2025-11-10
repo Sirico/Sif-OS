@@ -71,7 +71,7 @@ echo -e "${GREEN}✓ Backup created${NC}"
 
 # Copy new configuration (preserve hardware-configuration.nix)
 echo -e "${YELLOW}Installing new configuration...${NC}"
-cp configuration.nix machine-config.nix /etc/nixos/
+cp configuration.nix machine-config.nix self-update.sh /etc/nixos/
 cp -r modules/* /etc/nixos/modules/
 cp -r machines/* /etc/nixos/machines/ 2>/dev/null || true
 cp -r remmina-profiles/* /etc/nixos/remmina-profiles/ 2>/dev/null || true

@@ -171,7 +171,7 @@ ssh -o ServerAliveInterval=60 "$REMOTE_USER@$REMOTE_HOST" bash << EOF
     # Copy new configuration (preserve existing hardware-configuration.nix)
     echo "Copying configuration to /etc/nixos..."
     sudo mkdir -p /etc/nixos/modules /etc/nixos/machines /etc/nixos/remmina-profiles /etc/sifos/remmina-profiles
-    sudo cp configuration.nix machine-config.nix /etc/nixos/
+    sudo cp configuration.nix machine-config.nix self-update.sh /etc/nixos/
     sudo cp -r modules/* /etc/nixos/modules/
     sudo cp -r machines/* /etc/nixos/machines/ 2>/dev/null || true
     sudo cp -r remmina-profiles/* /etc/nixos/remmina-profiles/ 2>/dev/null || true
