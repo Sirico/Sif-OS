@@ -34,6 +34,7 @@
     wget
     curl
     htop
+    git  # Needed for self-update (admin only)
     
     # Network tools
     networkmanagerapplet
@@ -42,6 +43,14 @@
     gnome-console
     nautilus
   ];
+
+  # Install self-update script (admin only - requires sudo)
+  environment.etc."sifos/self-update.sh" = {
+    text = builtins.readFile ../self-update.sh;
+    mode = "0700";  # Only root can read/execute
+    user = "root";
+    group = "root";
+  };
 
   # Exclude unnecessary GNOME packages to save space
   environment.gnome.excludePackages = with pkgs; [

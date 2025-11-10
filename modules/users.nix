@@ -1,5 +1,9 @@
 # User Configuration Module
 # Defines standard users for SifOS thin clients
+#
+# Security model:
+# - admin: Full system access, can update configurations, requires sudo
+# - sif: Limited user, can only use applications, no system access
 
 { config, pkgs, ... }:
 
