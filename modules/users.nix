@@ -63,6 +63,18 @@
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
+  # Automatically unlock GNOME Keyring on auto-login
+  # This prevents keyring password prompts for the auto-logged-in user
+  security.pam.services.gdm.enableGnomeKeyring = true;
+  security.pam.services.gdm-autologin.text = ''
+    auth     required  pam_succeed_if.so user ingroup users
+    auth     optional  pam_gnome_keyring.so
+    account  include   gdm
+    password include   gdm
+    session  include   gdm
+    session  optional  pam_gnome_keyring.so auto_start
+  '';
+
   # Security: Allow wheel group to use sudo without password for admin
   security.sudo.extraRules = [
     {
