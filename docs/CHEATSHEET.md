@@ -37,10 +37,10 @@ You'll be prompted for:
 2. **Deploy all machines**:
    ```bash
    # Test mode
-   ./deploy-fleet.sh
+   ../scripts/deploy-fleet.sh
    
    # Apply immediately
-   ./deploy-fleet.sh -a
+   ../scripts/deploy-fleet.sh -a
    ```
 
 ## 🔧 Configure Remmina RDP
@@ -78,17 +78,17 @@ git push
 ./remote-deploy.sh -t 192.168.0.49 -h dispatch-01 -m thin-client -y -a
 
 # Or update entire fleet
-./deploy-fleet.sh -a
+../scripts/deploy-fleet.sh -a
 ```
 
 ## 🔍 Check Machine Status
 
 ```bash
 # Single machine
-./check-status.sh 192.168.0.49
+../scripts/check-status.sh 192.168.0.49
 
 # Multiple machines
-./check-status.sh dispatch-01 dispatch-02 office-pc-1
+../scripts/check-status.sh dispatch-01 dispatch-02 office-pc-1
 ```
 
 ## 🔄 Self-Update (On Machine)

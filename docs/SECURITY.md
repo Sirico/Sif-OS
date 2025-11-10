@@ -78,7 +78,7 @@ sudo /etc/sifos/self-update.sh
 
 **Fleet Update (multiple machines)**:
 ```bash
-./deploy-fleet.sh
+../scripts/deploy-fleet.sh
 # Requires: SSH access to all machines as admin
 ```
 

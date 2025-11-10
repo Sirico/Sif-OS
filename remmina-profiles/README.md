@@ -177,7 +177,7 @@ git commit -m "Configure RDP for dispatch VM at 192.168.1.100"
 git push
 
 # 3. Deploy to all machines
-./deploy-fleet.sh -a
+./scripts/deploy-fleet.sh -a
 
 # 4. Users login and profiles are ready!
 ```

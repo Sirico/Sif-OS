@@ -145,7 +145,7 @@ packages = with pkgs; [
 ./deploy.sh -h <hostname> -t <ip-address>
 
 # Check status of deployed machines
-./check-status.sh 192.168.0.49
+../scripts/check-status.sh 192.168.0.49
 
 # SSH to a machine
 ssh admin@<ip-or-hostname>

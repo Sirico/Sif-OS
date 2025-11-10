@@ -32,7 +32,7 @@ That's it! Your machine is ready. 🎉
 
 ```bash
 # Check machine status
-./check-status.sh 192.168.0.49
+../scripts/check-status.sh 192.168.0.49
 
 # SSH and verify services
 ssh admin@192.168.0.49
@@ -128,7 +128,7 @@ done
 1. Edit `modules/users.nix` on workstation
 2. Commit: `git commit -am "Add new user account"`
 3. Push: `git push`
-4. Deploy to fleet: `./deploy-fleet.sh` (or manually to each machine)
+4. Deploy to fleet: `../scripts/deploy-fleet.sh` (or manually to each machine)
 
 ### Scenario 2: Update Remmina Configuration
 
@@ -160,12 +160,12 @@ sudo nixos-rebuild switch
 
 ### Single Machine
 ```bash
-./check-status.sh 192.168.0.49
+../scripts/check-status.sh 192.168.0.49
 ```
 
 ### Multiple Machines
 ```bash
-./check-status.sh dispatch-01 dispatch-02 dispatch-03
+../scripts/check-status.sh dispatch-01 dispatch-02 dispatch-03
 ```
 
 ### Via SSH
@@ -288,7 +288,7 @@ Regular status checks:
 #!/bin/bash
 # health-check.sh
 for machine in $(cat machines/inventory.txt); do
-    ./check-status.sh $(echo $machine | cut -d: -f2)
+    ../scripts/check-status.sh $(echo $machine | cut -d: -f2)
 done
 ```
 

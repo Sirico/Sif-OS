@@ -50,8 +50,7 @@
     networkmanagerapplet
   ];
 
-  # Exclude all unnecessary packages
-  services.xserver.desktopManager.xfce.enableXfwm = false;
+  # XFCE settings for kiosk
   services.xserver.desktopManager.xfce.noDesktop = false;
 
   # Auto-login to kiosk user (sif)
@@ -97,7 +96,6 @@
   systemd.timers."daily-reboot" = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "daily";
       OnCalendar = "*-*-* 03:00:00";
       Persistent = true;
     };

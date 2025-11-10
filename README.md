@@ -20,7 +20,7 @@ Primary target: **Dell Wyse 5070 Thin Client**
 
 ## Quick Start
 
-**👉 For daily operations, see [FLEET-MANAGEMENT.md](FLEET-MANAGEMENT.md) or [CHEATSHEET.md](CHEATSHEET.md)**
+**👉 For daily operations, see [docs/FLEET-MANAGEMENT.md](docs/FLEET-MANAGEMENT.md) or [docs/CHEATSHEET.md](docs/CHEATSHEET.md)**
 
 ### Deploy Your First Machine
 
@@ -32,84 +32,82 @@ Primary target: **Dell Wyse 5070 Thin Client**
 ./remote-deploy.sh -t 192.168.0.49 -h dispatch-01 -m thin-client -y -a
 ```
 
+### Test Before Pushing
+
+```bash
+# Test all machine types build successfully
+./scripts/test-build.sh
+```
+
 ### Make Configuration Changes
 
 ```bash
 # 1. Edit files
 vim modules/users.nix
 
-# 2. Test on one machine
+# 2. Test the configuration
+./scripts/test-build.sh
+
+# 3. Test on one machine
 ./remote-deploy.sh -t 192.168.0.49 -h test -m thin-client -y
 
-# 3. Commit and push
+# 4. Commit and push
 git add .
 git commit -m "Added new user"
 git push
 
-# 4. Deploy to fleet
-./deploy-fleet.sh -a
+# 5. Deploy to fleet
+./scripts/deploy-fleet.sh -a
 ```
 
-See [FLEET-MANAGEMENT.md](FLEET-MANAGEMENT.md) for complete workflow.
+See [docs/FLEET-MANAGEMENT.md](docs/FLEET-MANAGEMENT.md) for complete workflow.
 
-### Original Setup (First Time Only)
-
-For the initial NixOS installation on new hardware:
-
-```bash
-# Copy configuration to target machine
-scp -r configuration.nix modules/ nixos/ root@target-machine:/etc/nixos/
-
-# Or if using the provided hardware-configuration.nix
-scp configuration.nix modules/* root@target-machine:/etc/nixos/
-```
-
-### 2. Customize Configuration
-
-Before deploying, edit these files:
-
-**modules/users.nix**:
-- Add your SSH public key to the admin user
-- Change the sif user's initial password
-
-**configuration.nix**:
-- Set the hostname for each thin client
-
-### 3. Build and Deploy
-
-```bash
-# On the target machine
-sudo nixos-rebuild switch
-
-# Or test first
-sudo nixos-rebuild test
-```
-
-### 4. Post-Installation
-
-**Connect to Tailscale** (first time only):
-```bash
-sudo tailscale up
-```
-
-**Set passwords**:
-```bash
-sudo passwd admin
-sudo passwd sif
-```
-
-## Structure
+## Repository Structure
 
 ```
 sifos/
-├── configuration.nix              # Main configuration
-├── nixos/
-│   └── hardware-configuration.nix # Hardware-specific config
-└── modules/
-    ├── users.nix                  # User accounts
-    ├── thin-client.nix            # Desktop environment
-    ├── remote-access.nix          # SSH & Tailscale
-    └── printing.nix               # CUPS & label printers
+├── configuration.nix              # Main NixOS configuration entry point
+├── machine-config.nix             # Per-machine settings (hostname, type)
+│
+├── modules/                       # Core system modules
+│   ├── users.nix                  # Admin and sif user accounts
+│   ├── remote-access.nix          # SSH and Tailscale VPN
+│   ├── printing.nix               # CUPS printing system
+│   └── remmina.nix                # RDP client configuration
+│
+├── machine-types/                 # Machine type-specific configs
+│   ├── thin-client.nix            # Minimal RDP desktop
+│   ├── office.nix                 # Full productivity desktop
+│   ├── workstation.nix            # Development environment
+│   └── shop-kiosk.nix             # Locked-down kiosk
+│
+├── machines/                      # Fleet inventory
+│   ├── inventory.txt              # List of all machines
+│   └── template.nix               # Template for new machines
+│
+├── remmina-profiles/              # Pre-configured RDP profiles
+│   └── windows-vm.remmina         # Windows VM connection
+│
+├── nixos/                         # Hardware-specific configs
+│   └── hardware-configuration.nix # Generated per machine
+│
+├── scripts/                       # Deployment and utility scripts
+│   ├── test-build.sh              # Test all configurations
+│   ├── check-status.sh            # Check fleet status
+│   ├── deploy-fleet.sh            # Deploy to multiple machines
+│   └── test-config.sh             # Validate configuration
+│
+├── docs/                          # Documentation
+│   ├── QUICKSTART.md              # Quick start guide
+│   ├── DEPLOYMENT.md              # Deployment procedures
+│   ├── FLEET-MANAGEMENT.md        # Fleet management guide
+│   ├── TESTING.md                 # Testing procedures
+│   ├── CHEATSHEET.md              # Command reference
+│   ├── SECURITY.md                # Security model
+│   └── PROJECT-SUMMARY.md         # Project overview
+│
+├── remote-deploy.sh               # Main deployment script
+└── self-update.sh                 # On-machine update script
 ```
 
 ## Features
@@ -199,15 +197,15 @@ nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=./is
 
 ### Network Installation
 
-For remote installation on existing NixOS machines:
+## Documentation
 
-```bash
-# Copy configuration
-scp -r . admin@target:/tmp/sifos-config/
-
-# Apply configuration
-ssh admin@target 'sudo cp -r /tmp/sifos-config/* /etc/nixos/ && sudo nixos-rebuild switch'
-```
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get started in 5 minutes
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Detailed deployment procedures
+- **[Fleet Management](docs/FLEET-MANAGEMENT.md)** - Managing multiple machines
+- **[Testing Guide](docs/TESTING.md)** - How to test before pushing to GitHub
+- **[Cheat Sheet](docs/CHEATSHEET.md)** - Common commands reference
+- **[Security Model](docs/SECURITY.md)** - Security architecture and practices
+- **[Project Summary](docs/PROJECT-SUMMARY.md)** - High-level overview
 
 ## Troubleshooting
 
@@ -244,10 +242,13 @@ sudo systemctl status sshd
 
 When adding features or fixing issues:
 
-1. Test on a Wyse 5070 or similar hardware
-2. Ensure remote management still works
-3. Document any new configuration options
-4. Keep the system lightweight for thin client use
+1. **Test first**: Run `./scripts/test-build.sh` before committing
+2. Test on a Wyse 5070 or similar hardware
+3. Ensure remote management still works
+4. Document any new configuration options
+5. Keep the system lightweight for thin client use
+
+See [docs/TESTING.md](docs/TESTING.md) for testing procedures.
 
 ## License
 
