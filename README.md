@@ -30,14 +30,42 @@ Works on x86_64 hardware including:
 
 **👉 For daily operations, see [docs/FLEET-MANAGEMENT.md](docs/FLEET-MANAGEMENT.md) or [docs/CHEATSHEET.md](docs/CHEATSHEET.md)**
 
+### Enroll a New Machine
+
+```bash
+# Enroll a fresh NixOS installation into the fleet
+./enroll-machine.sh -t 192.168.0.50 -h thin-client-7 -m thin-client
+
+# With Tailscale IP (if known)
+./enroll-machine.sh -t 192.168.0.50 -h thin-client-7 -m thin-client -s 100.78.103.62
+
+# Server enrollment
+./enroll-machine.sh -t 192.168.0.100 -h server-1 -m server
+```
+
 ### Deploy Your First Machine
 
 ```bash
-# Interactive deployment (prompts for hostname and type)
-./remote-deploy.sh -t 192.168.0.49
+# Single machine deployment via Tailscale
+./remote-deploy.sh -t sifos-thin-client-6 -h thin-client-6 -m thin-client -y -a
 
-# Or specify everything
+# Or use local IP (if on same network)
 ./remote-deploy.sh -t 192.168.0.49 -h dispatch-01 -m thin-client -y -a
+
+# Fleet deployment - list available machines
+./fleet-deploy.sh -l
+
+# Deploy to all thin clients
+./fleet-deploy.sh -t thin-client -y
+
+# Deploy to specific machine
+./fleet-deploy.sh -m sifos-thin-client-6 -y
+
+# Deploy to all machines (careful!)
+./fleet-deploy.sh -a -y
+
+# Interactive mode
+./fleet-deploy.sh
 ```
 
 ### Test Before Pushing
@@ -57,15 +85,15 @@ vim modules/users.nix
 ./scripts/test-build.sh
 
 # 3. Test on one machine
-./remote-deploy.sh -t 192.168.0.49 -h test -m thin-client -y
+./remote-deploy.sh -t sifos-thin-client-6 -h thin-client-6 -m thin-client -y
 
 # 4. Commit and push
 git add .
 git commit -m "Added new user"
 git push
 
-# 5. Deploy to fleet
-./scripts/deploy-fleet.sh -a
+# 5. Deploy to fleet via Tailscale
+./fleet-deploy.sh -t thin-client -y
 ```
 
 See [docs/FLEET-MANAGEMENT.md](docs/FLEET-MANAGEMENT.md) for complete workflow.
