@@ -62,6 +62,7 @@ TYPES=(
     "thin-client:./machine-types/thin-client.nix"
     "office:./machine-types/office.nix"
     "workstation:./machine-types/workstation.nix"
+    "darren-workstation:./machine-types/darren-workstation.nix"
     "shop-kiosk:./machine-types/shop-kiosk.nix"
     "server:./machine-types/server.nix"
     "custom:none"
