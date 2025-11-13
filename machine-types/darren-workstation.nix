@@ -7,13 +7,14 @@
 {
   imports = [
     ../modules/shell.nix
-    ../modules/work-context-switcher.nix
+    ../modules/work-pwa.nix
   ];
-  
-  # Enable work context switching
-  workContextSwitcher.enable = true;
 
-  # Full GNOME Desktop (matching your personal config)
+  # Enable work PWA launchers for SIF and PEI
+  workPWA = {
+    enable = true;
+    browser = "chromium";  # or "brave", "google-chrome", "microsoft-edge"
+  };  # Full GNOME Desktop (matching your personal config)
   services.xserver = {
     enable = true;
     displayManager.gdm.enable = true;
