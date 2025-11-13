@@ -62,6 +62,12 @@ in {
       default = "chromium";
       description = "Browser to use for PWAs";
     };
+    
+    autoStart = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Automatically launch all work PWAs at login";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -136,5 +142,24 @@ in {
         echo "✅ PEI Outlook and Teams launched!"
       '')
     ];
+    
+    # Auto-start work apps at login if enabled
+    xdg.autostart = mkIf cfg.autoStart {
+      enable = true;
+    };
+    
+    environment.etc = mkIf cfg.autoStart {
+      "xdg/autostart/work-launch-all.desktop".text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Launch Work Apps
+        Comment=Auto-launch SIF and PEI Outlook and Teams
+        Exec=${pkgs.bash}/bin/bash -c "sleep 5 && work-launch-all"
+        Terminal=false
+        Hidden=false
+        X-GNOME-Autostart-enabled=true
+        Categories=Office;
+      '';
+    };
   };
 }
