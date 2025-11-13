@@ -93,7 +93,7 @@
       # Enable xrdp for remote desktop access
       services.xrdp = {
         enable = true;
-        defaultWindowManager = "${pkgs.gnome-session}/bin/gnome-session";
+        defaultWindowManager = "gnome-session";
         openFirewall = false;  # We'll manage firewall ourselves
       };
 
@@ -102,11 +102,40 @@
         allowedTCPPorts = [ 3389 ];  # RDP port
       };
 
-      # Ensure xrdp can access the display
-      systemd.services.xrdp.serviceConfig = {
-        # Allow xrdp to create sessions
-        User = lib.mkForce "root";
+      # Fix for GNOME black screen issue
+      # Create .xsession file for users to start GNOME properly
+      environment.etc."skel/.xsession" = {
+        text = ''
+          #!/bin/sh
+          unset SESSION_MANAGER
+          unset DBUS_SESSION_BUS_ADDRESS
+          exec gnome-session
+        '';
+        mode = "0755";
       };
+
+      # Ensure xrdp-sesman can create sessions
+      systemd.services.xrdp-sesman.path = with pkgs; [ 
+        gnome-session 
+        gnome-shell 
+        dbus 
+      ];
+      
+      # Create .xsession for existing users
+      system.activationScripts.xrdp-gnome-setup = ''
+        for user in sif admin; do
+          if [ -d "/home/$user" ]; then
+            cat > /home/$user/.xsession << 'EOF'
+        #!/bin/sh
+        unset SESSION_MANAGER
+        unset DBUS_SESSION_BUS_ADDRESS
+        exec gnome-session
+        EOF
+            chmod +x /home/$user/.xsession
+            chown $user:users /home/$user/.xsession
+          fi
+        done
+      '';
     })
     
     # Display Tailscale connection info
