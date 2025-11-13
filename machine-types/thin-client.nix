@@ -12,7 +12,10 @@
     enable = true;
     
     # GNOME Desktop (lightweight alternative: xfce)
-    displayManager.gdm.enable = true;
+    displayManager.gdm = {
+      enable = true;
+      wayland = false;  # Disable Wayland for better xrdp compatibility
+    };
     desktopManager.gnome.enable = true;
   };
 
