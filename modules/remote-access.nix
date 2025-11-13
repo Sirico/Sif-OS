@@ -91,22 +91,35 @@
     
     # Optional: RDP server
     (lib.mkIf config.sifos.rdp.enable {
-      # Use GNOME's native RDP support (gnome-remote-desktop)
-      # This works much better than xrdp with GNOME
-      services.gnome.gnome-remote-desktop.enable = true;
+      # Use xrdp for RDP access with GNOME
+      services.xrdp = {
+        enable = true;
+        defaultWindowManager = "gnome-session";
+        openFirewall = false;  # We manage firewall ourselves
+      };
 
       # Allow RDP port
       networking.firewall = {
         allowedTCPPorts = [ 3389 ];  # RDP port
       };
       
-      # Enable required services for GNOME remote desktop
-      services.pipewire.enable = true;
-      
-      # Make sure required packages are available
-      environment.systemPackages = with pkgs; [
-        gnome-remote-desktop
-      ];
+      # Create .xsession for GNOME RDP sessions
+      environment.etc."xrdp/startwm.sh" = {
+        text = ''
+          #!/bin/sh
+          if [ -r /etc/profile ]; then
+            . /etc/profile
+          fi
+          
+          if [ -r ~/.profile ]; then
+            . ~/.profile
+          fi
+          
+          # Start GNOME session
+          exec ${pkgs.gnome-session}/bin/gnome-session
+        '';
+        mode = "0755";
+      };
     })
     
     # Display Tailscale connection info
