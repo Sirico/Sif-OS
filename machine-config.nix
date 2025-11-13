@@ -6,11 +6,15 @@
 
 {
   # Machine hostname - set during deployment
-  networking.hostName = "sifos-thin-client-1";
+  networking.hostName = "sifos-thin-client-6";
+  
+  # Tailscale IP for this machine (update after first tailscale up)
+  # This helps document the Tailscale IP for remote RDP/SSH access
+  sifos.tailscale.advertiseAddress = "100.78.103.61";
   
   # Machine type - determines which features are enabled
   # Options: thin-client, office, workstation, shop-kiosk, custom
-  # Current: thin-client (set 2025-11-10)
+  # Current: thin-client (set 2025-11-13)
   
   # Import machine type configuration
   imports = [

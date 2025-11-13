@@ -8,6 +8,15 @@
     sifos.rdp = {
       enable = lib.mkEnableOption "RDP server for remote desktop access";
     };
+    
+    sifos.tailscale = {
+      advertiseAddress = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Tailscale IP address for this machine (for documentation)";
+        example = "100.78.103.61";
+      };
+    };
   };
 
   config = lib.mkMerge [
@@ -98,6 +107,25 @@
         # Allow xrdp to create sessions
         User = lib.mkForce "root";
       };
+    })
+    
+    # Display Tailscale connection info
+    (lib.mkIf (config.sifos.tailscale.advertiseAddress != null) {
+      environment.etc."issue".text = lib.mkAfter ''
+        
+        Tailscale IP: ${config.sifos.tailscale.advertiseAddress}
+        RDP Access: ${config.sifos.tailscale.advertiseAddress}:3389
+      '';
+      
+      # Show on SSH login
+      programs.bash.interactiveShellInit = lib.mkAfter ''
+        if [ -n "$SSH_CONNECTION" ]; then
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Tailscale IP: ${config.sifos.tailscale.advertiseAddress}"
+          echo "RDP Access: ${config.sifos.tailscale.advertiseAddress}:3389"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        fi
+      '';
     })
   ];
 }
