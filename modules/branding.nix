@@ -99,6 +99,12 @@
         "org/gnome/login-screen" = {
           logo = "/etc/sifos/branding/company-logo.png";
         };
+        # Enable GNOME Remote Desktop (RDP) for remote access
+        "org/gnome/desktop/remote-desktop/rdp" = {
+          enable = true;
+          view-only = false;
+          screen-share-mode = "extend";
+        };
       };
     }];
   };

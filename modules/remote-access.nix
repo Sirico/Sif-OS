@@ -88,6 +88,7 @@
   '';
     }
 
+    
     # Optional: RDP server
     (lib.mkIf config.sifos.rdp.enable {
       # Use GNOME's native RDP support (gnome-remote-desktop)
