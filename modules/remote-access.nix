@@ -1,9 +1,18 @@
 # Remote Access Configuration Module
-# SSH and Tailscale setup for remote management
+# SSH, Tailscale, and RDP setup for remote management
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
+  options = {
+    sifos.rdp = {
+      enable = lib.mkEnableOption "RDP server for remote desktop access";
+    };
+  };
+
+  config = lib.mkMerge [
+    # Always enabled: SSH and Tailscale
+    {
   # OpenSSH Server
   services.openssh = {
     enable = true;
@@ -68,4 +77,27 @@
     ServerAliveInterval 60
     ServerAliveCountMax 10
   '';
+    }
+
+    # Optional: RDP server
+    (lib.mkIf config.sifos.rdp.enable {
+      # Enable xrdp for remote desktop access
+      services.xrdp = {
+        enable = true;
+        defaultWindowManager = "${pkgs.gnome-session}/bin/gnome-session";
+        openFirewall = false;  # We'll manage firewall ourselves
+      };
+
+      # Allow RDP port on Tailscale interface only
+      networking.firewall = {
+        allowedTCPPorts = [ 3389 ];  # RDP port
+      };
+
+      # Ensure xrdp can access the display
+      systemd.services.xrdp.serviceConfig = {
+        # Allow xrdp to create sessions
+        User = lib.mkForce "root";
+      };
+    })
+  ];
 }

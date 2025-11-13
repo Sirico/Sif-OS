@@ -4,6 +4,9 @@
 { config, pkgs, ... }:
 
 {
+  # Enable RDP server for remote access to this thin client
+  sifos.rdp.enable = true;
+
   # X11 and Desktop Environment
   services.xserver = {
     enable = true;
