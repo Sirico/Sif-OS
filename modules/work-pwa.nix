@@ -16,7 +16,7 @@ let
         Type=Application
         Name=${displayName}
         Comment=Launch ${displayName} as PWA
-        Exec=${browser} --app=${url} --class=${name} --user-data-dir=$HOME/.config/${name}-pwa
+        Exec=${browser} --app=${url} --class=${name} --user-data-dir=$HOME/.config/${name}-pwa --window-name="${displayName}"
         Icon=${icon}
         Terminal=false
         Categories=Office;Network;
@@ -68,10 +68,10 @@ in {
     # Add helper scripts
     environment.shellAliases = {
       # Quick launchers
-      "sif-outlook" = "${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa &";
-      "sif-teams" = "${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa &";
-      "pei-outlook" = "${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa &";
-      "pei-teams" = "${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa &";
+      "sif-outlook" = "${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa --window-name='SIF Outlook' &";
+      "sif-teams" = "${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa --window-name='SIF Teams' &";
+      "pei-outlook" = "${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa --window-name='PEI Outlook' &";
+      "pei-teams" = "${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa --window-name='PEI Teams' &";
     };
 
     # Install the browser, PWA desktop entries, and launcher scripts
@@ -97,19 +97,19 @@ in {
         echo ""
         
         echo "📧 Starting SIF Outlook..."
-        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa &
+        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa --window-name="SIF Outlook" &
         sleep 2
         
         echo "💬 Starting SIF Teams..."
-        ${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa &
+        ${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa --window-name="SIF Teams" &
         sleep 2
         
         echo "📧 Starting PEI Outlook..."
-        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa &
+        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa --window-name="PEI Outlook" &
         sleep 2
         
         echo "💬 Starting PEI Teams..."
-        ${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa &
+        ${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa --window-name="PEI Teams" &
         
         echo ""
         echo "✅ All work applications launched!"
@@ -121,18 +121,18 @@ in {
       (pkgs.writeScriptBin "work-launch-sif" ''
         #!${pkgs.bash}/bin/bash
         echo "🚀 Launching SIF applications..."
-        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa &
+        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=sif-outlook --user-data-dir=$HOME/.config/sif-outlook-pwa --window-name="SIF Outlook" &
         sleep 2
-        ${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa &
+        ${cfg.browser} --app=https://teams.microsoft.com/ --class=sif-teams --user-data-dir=$HOME/.config/sif-teams-pwa --window-name="SIF Teams" &
         echo "✅ SIF Outlook and Teams launched!"
       '')
 
       (pkgs.writeScriptBin "work-launch-pei" ''
         #!${pkgs.bash}/bin/bash
         echo "🚀 Launching PEI applications..."
-        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa &
+        ${cfg.browser} --app=https://outlook.office.com/mail/ --class=pei-outlook --user-data-dir=$HOME/.config/pei-outlook-pwa --window-name="PEI Outlook" &
         sleep 2
-        ${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa &
+        ${cfg.browser} --app=https://teams.microsoft.com/ --class=pei-teams --user-data-dir=$HOME/.config/pei-teams-pwa --window-name="PEI Teams" &
         echo "✅ PEI Outlook and Teams launched!"
       '')
     ];
