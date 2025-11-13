@@ -7,7 +7,11 @@
 {
   imports = [
     ../modules/shell.nix
+    ../modules/work-context-switcher.nix
   ];
+  
+  # Enable work context switching
+  workContextSwitcher.enable = true;
 
   # Full GNOME Desktop (matching your personal config)
   services.xserver = {
