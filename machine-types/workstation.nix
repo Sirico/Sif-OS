@@ -4,6 +4,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../modules/shell.nix
+  ];
+
   # X11 and Desktop Environment
   services.xserver = {
     enable = true;

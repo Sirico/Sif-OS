@@ -15,6 +15,10 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    ../modules/shell.nix
+  ];
+
   # Server doesn't need desktop environment
   services.xserver.enable = lib.mkForce false;
   services.desktopManager.plasma6.enable = lib.mkForce false;
