@@ -8,6 +8,7 @@
 
   imports = [
     ../modules/citizen-da210-cups-filter-pkg.nix
+    ../modules/da210-setuid.nix
   ];
 
   # Enable RDP server for remote access to this thin client
@@ -35,8 +36,9 @@
     pulse.enable = true;
   };
 
-  # Essential thin client packages
-  environment.systemPackages = with pkgs; [
+  # Essential thin client packages (registered as defaults so they merge cleanly
+  # with other modules' package lists)
+  environment.systemPackages = pkgs.lib.mkDefault (with pkgs; [
     # RDP Client
     remmina
     
@@ -54,7 +56,11 @@
     # File manager
     gnome-console
     nautilus
-  ];
+    # Add the DA-210 driver package (if driver files are placed in repo at files/da210)
+    # The package file `packages/da210-driver.nix` expects the driver files under `files/da210/`.
+    # If you have not added those files yet, the package will build but will be empty.
+    (import ../packages/da210-driver.nix { inherit pkgs; })
+  ]);
 
   # Exclude unnecessary GNOME packages to save space
   environment.gnome.excludePackages = with pkgs; [
