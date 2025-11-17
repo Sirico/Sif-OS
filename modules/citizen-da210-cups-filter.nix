@@ -2,6 +2,9 @@
 { config, pkgs, ... }:
 
 {
-  # Install rastertocls filter to CUPS filter directory using environment.etc
-  environment.etc."cups/filter/rastertocls".source = "/home/darren/Documents/usr/lib64/cups/filter/rastertocls";
+  # Install rastertocls filter to CUPS filter directory using environment.etc, source from repo
+  environment.etc."cups/filter/rastertocls" = {
+    source = ../files/rastertocls;
+    mode = "0755";
+  };
 }
