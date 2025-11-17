@@ -38,18 +38,9 @@
   };
 
   # Tailscale VPN
-  services.tailscale = let
-    # If a local access file with an auth key exists in the repo, read it
-    # at evaluation time; fall back to null so we don't error if missing.
-    authKeyPath = ../access/tailscale-auth.key;
-    authKey = if builtins.pathExists authKeyPath then builtins.readFile authKeyPath else null;
-  in {
+  services.tailscale = {
     enable = true;
     useRoutingFeatures = "client";
-    # Optional: install an auth key from the repo to auto-join a tailnet.
-    # If the auth key file is not present, leave it unset and require
-    # manual `tailscale up` on the device.
-    authKey = authKey;
   };
 
   # Firewall configuration
@@ -78,14 +69,28 @@
       Type = "oneshot";
     };
     script = ''
-      # Wait for tailscale to be ready
+      # Wait for network to be up a bit
       sleep 2
+
+      TAILSCALE_BIN=${pkgs.tailscale}/bin/tailscale
+      AUTHFILE=/etc/sif/access/tailscale-auth.key
+
+      # If an auth key file is placed on the device at /etc/sif/access/tailscale-auth.key
+      # this unit will run `tailscale up --authkey <key>` so the device can auto-join a tailnet.
+      if [ -r "$AUTHFILE" ]; then
+        echo "Found auth key at $AUTHFILE — attempting to bring tailscale up"
+        key=$(cat "$AUTHFILE" | tr -d '\n' | tr -d '\r')
+        if [ -n "$key" ]; then
+          "$TAILSCALE_BIN" up --authkey "$key" || true
+        fi
+      fi
+
       # Check if already connected
-      status="$(${pkgs.tailscale}/bin/tailscale status -json 2>/dev/null || echo '{}')"
+      status="$($TAILSCALE_BIN status -json 2>/dev/null || echo '{}')"
       if echo "$status" | ${pkgs.jq}/bin/jq -e '.BackendState == "Running"' > /dev/null; then
-        echo "Tailscale already connected"
+        echo "Tailscale connected"
       else
-        echo "Tailscale not connected. Please run 'tailscale up' manually first time."
+        echo "Tailscale not connected. Please run 'tailscale up' manually if needed."
       fi
     '';
   };
