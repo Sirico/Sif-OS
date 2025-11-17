@@ -1,10 +1,7 @@
+
 { config, pkgs, ... }:
 
 {
-  # Copy rastertocls filter to CUPS filter directory
-  system.activationScripts.citizenDA210Filter = {
-    text = ''
-      install -m 755 /home/darren/Documents/usr/lib64/cups/filter/rastertocls /etc/cups/filter/rastertocls
-    '';
-  };
+  # Install rastertocls filter to CUPS filter directory using environment.etc
+  environment.etc."cups/filter/rastertocls".source = "/home/darren/Documents/usr/lib64/cups/filter/rastertocls";
 }
