@@ -7,7 +7,7 @@
   nix.settings.require-sigs = false;
 
   imports = [
-    ../modules/citizen-da210-cups-filter-fixed.nix
+    ../modules/citizen-da210-cups-filter-deriv.nix
   ];
 
   # Enable RDP server for remote access to this thin client
