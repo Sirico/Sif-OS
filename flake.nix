@@ -60,6 +60,8 @@
         
         # Shop kiosks
         "sifos-kiosk-1" = mkSifOSSystem "sifos-kiosk-1" ./machine-types/shop-kiosk.nix [];
+        # Recovery / rescue machine type
+        "recovery-thin-client" = mkSifOSSystem "recovery-thin-client" ./machine-types/recovery.nix [];
       };
       
       # Deployment helpers

@@ -38,9 +38,18 @@
   };
 
   # Tailscale VPN
-  services.tailscale = {
+  services.tailscale = let
+    # If a local access file with an auth key exists in the repo, read it
+    # at evaluation time; fall back to null so we don't error if missing.
+    authKeyPath = ../access/tailscale-auth.key;
+    authKey = if builtins.pathExists authKeyPath then builtins.readFile authKeyPath else null;
+  in {
     enable = true;
     useRoutingFeatures = "client";
+    # Optional: install an auth key from the repo to auto-join a tailnet.
+    # If the auth key file is not present, leave it unset and require
+    # manual `tailscale up` on the device.
+    authKey = authKey;
   };
 
   # Firewall configuration
