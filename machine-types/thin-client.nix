@@ -4,6 +4,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../modules/citizen-da210-cups-filter.nix
+  ];
+
   # Enable RDP server for remote access to this thin client
   sifos.rdp.enable = true;
 

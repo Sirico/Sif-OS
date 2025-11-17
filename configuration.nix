@@ -7,7 +7,7 @@
 {
   imports =
     [ 
-      ./nixos/hardware-configuration.nix
+      # ./nixos/hardware-configuration.nix
       ./modules/users.nix
       ./modules/remote-access.nix
       ./modules/printing.nix

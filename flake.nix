@@ -41,6 +41,9 @@
       # Machine configurations
       nixosConfigurations = {
         # Thin clients
+        "thin-client-6" = mkSifOSSystem "thin-client-6" ./machine-types/thin-client.nix [
+          ./nixos/hardware-configuration-thin-client-6.nix
+        ];
         "sifos-thin-client-6" = mkSifOSSystem "sifos-thin-client-6" ./machine-types/thin-client.nix [];
         
         # Office machines
