@@ -4,6 +4,8 @@
 { config, pkgs, ... }:
 
 {
+  nix.settings.require-sigs = false;
+
   imports = [
     ../modules/citizen-da210-cups-filter.nix
   ];
