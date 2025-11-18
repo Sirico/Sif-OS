@@ -53,6 +53,9 @@
   # Allow unfree packages (needed for some drivers)
   nixpkgs.config.allowUnfree = true;
 
+  # Enable flakes and the new CLI globally so rebuilds don't need per-command flags
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # System State Version
   system.stateVersion = "25.05";
 }

@@ -18,7 +18,7 @@ in
     extraGroups = [ "wheel" "networkmanager" ];
     # lock password login; rely on SSH key
     password = null;
-    openssh.authorizedKeys.keys = lib.mkIf (adminKey != "") [ adminKey ] [];
+    openssh.authorizedKeys.keys = lib.optional (adminKey != "") adminKey;
   };
 
   # Allow sudo for wheel without password in recovery scenario

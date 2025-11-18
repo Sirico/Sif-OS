@@ -8,6 +8,7 @@
 
   imports = [
     ../modules/da210-setuid.nix
+    ../modules/da210-driver.nix
   ];
 
   # Enable RDP server for remote access to this thin client
@@ -48,8 +49,10 @@
     networkmanagerapplet
     gnome-console
     nautilus
-    self.packages.${pkgs.system}.tsc-da210-barcode-driver
   ]);
+
+  # Enable the DA-210 printer driver integration for thin clients
+  sifos.printers.da210.enable = true;
 
   # Exclude unnecessary GNOME packages to save space
   environment.gnome.excludePackages = with pkgs; [

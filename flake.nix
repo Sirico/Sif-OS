@@ -14,7 +14,22 @@
   outputs = { self, nixpkgs, ... } @ inputs:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        # Allow the bundled DA-210 driver (unfree) while keeping other
+        # outputs free by default.
+        config.allowUnfreePredicate = pkg:
+          builtins.elem (nixpkgs.lib.getName pkg) [ "tsc-da210-barcode-driver" ];
+      };
+      # Fallback hardware stub to satisfy evaluation for generic targets.
+      hardwareDefault = { lib, ... }: {
+        # Dummy root FS; should be overridden by real hardware configs in
+        # deployed systems.
+        fileSystems."/" = lib.mkDefault {
+          device = "/dev/disk/by-uuid/PLACEHOLDER";
+          fsType = "ext4";
+        };
+      };
       
       # Common module imports for all SifOS machines
       commonModules = [
@@ -40,30 +55,45 @@
     in
     {
       packages.x86_64-linux.tsc-da210-barcode-driver = import ./packages/da210-driver.nix { inherit pkgs; };
+
       # Machine configurations
       nixosConfigurations = {
         # Thin clients
         "thin-client-6" = mkSifOSSystem "sifos-thin-client-6" ./machine-types/thin-client.nix [
           ./nixos/hardware-configuration-thin-client-6.nix
         ];
-        "sifos-thin-client-6" = mkSifOSSystem "sifos-thin-client-6" ./machine-types/thin-client.nix [];
+        "sifos-thin-client-6" = mkSifOSSystem "sifos-thin-client-6" ./machine-types/thin-client.nix [
+          ./nixos/hardware-configuration-thin-client-6.nix
+        ];
         
         # Office machines
-        "sifos-office-1" = mkSifOSSystem "sifos-office-1" ./machine-types/office.nix [];
+        "sifos-office-1" = mkSifOSSystem "sifos-office-1" ./machine-types/office.nix [
+          hardwareDefault
+        ];
         
         # Workstations
-        "sifos-workstation-1" = mkSifOSSystem "sifos-workstation-1" ./machine-types/workstation.nix [];
+        "sifos-workstation-1" = mkSifOSSystem "sifos-workstation-1" ./machine-types/workstation.nix [
+          hardwareDefault
+        ];
         
         # Personal workstation (can optionally import from personal-config)
-        "darren-workstation" = mkSifOSSystem "darren-workstation" ./machine-types/darren-workstation.nix [];
+        "darren-workstation" = mkSifOSSystem "darren-workstation" ./machine-types/darren-workstation.nix [
+          hardwareDefault
+        ];
         
         # Servers
-        "sifos-server-1" = mkSifOSSystem "sifos-server-1" ./machine-types/server.nix [];
+        "sifos-server-1" = mkSifOSSystem "sifos-server-1" ./machine-types/server.nix [
+          hardwareDefault
+        ];
         
         # Shop kiosks
-        "sifos-kiosk-1" = mkSifOSSystem "sifos-kiosk-1" ./machine-types/shop-kiosk.nix [];
+        "sifos-kiosk-1" = mkSifOSSystem "sifos-kiosk-1" ./machine-types/shop-kiosk.nix [
+          hardwareDefault
+        ];
         # Recovery / rescue machine type
-        "recovery-thin-client" = mkSifOSSystem "recovery-thin-client" ./machine-types/recovery.nix [];
+        "recovery-thin-client" = mkSifOSSystem "recovery-thin-client" ./machine-types/recovery.nix [
+          hardwareDefault
+        ];
       };
       
       # Deployment helpers

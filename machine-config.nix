@@ -6,25 +6,18 @@
 
 {
   # Machine hostname - set during deployment
-  networking.hostName = "sifos-thin-client-6";
+  # Default hostname for this generated config; allow higher-priority overrides
+  # from the flake entries (mkDefault avoids conflicts during flake checks).
+  networking.hostName = lib.mkDefault "sifos-thin-client-6";
   
   # Tailscale IP for this machine (update after first tailscale up)
   # This helps document the Tailscale IP for remote RDP/SSH access
   sifos.tailscale.advertiseAddress = "100.78.103.61";
   
-  # Machine type - determines which features are enabled
-  # Options: thin-client, office, workstation, shop-kiosk, custom
-  # Current: thin-client (set 2025-11-13)
-  
-  # Import machine type configuration
-  imports = [
-    ./machine-types/thin-client.nix
-    # Change above line based on machine type:
-    # ./machine-types/thin-client.nix
-    # ./machine-types/office.nix
-    # ./machine-types/workstation.nix
-    # ./machine-types/shop-kiosk.nix
-  ];
+  # Machine type selection is handled in flake outputs; keep this file for
+  # per-machine knobs (hostname, tailscale, overrides). If using a non-flake
+  # workflow, add your desired machine type module to `imports` below.
+  imports = [ ];
   
   # Optional: Static IP configuration
   # Uncomment and configure if needed

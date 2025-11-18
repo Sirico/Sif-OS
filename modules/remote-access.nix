@@ -26,7 +26,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication = true;  # Can disable after SSH keys are deployed
+      PasswordAuthentication = lib.mkDefault true;  # Can disable after SSH keys are deployed
       PermitRootLogin = "no";
       X11Forwarding = true;
     };
