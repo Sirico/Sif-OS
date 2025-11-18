@@ -1,7 +1,7 @@
 # Thin Client Configuration Module
 # Minimal desktop for RDP/dispatch stations
 
-{ config, pkgs, self, ... }:
+{ config, pkgs, lib, self, ... }:
 
 {
   nix.settings.require-sigs = false;
@@ -36,9 +36,8 @@
     pulse.enable = true;
   };
 
-  # Essential thin client packages (registered as defaults so they merge cleanly
-  # with other modules' package lists)
-  environment.systemPackages = pkgs.lib.mkDefault (with pkgs; [
+  # Essential thin client packages (append so they always land in the profile)
+  environment.systemPackages = lib.mkAfter (with pkgs; [
     remmina
     firefox
     vim
