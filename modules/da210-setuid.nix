@@ -6,13 +6,15 @@ with lib;
   options = { };
 
   config = {
-    systemd.tmpfiles.rules = lib.mkOptionList (
-      [ # Ensure the thermalprinterut helper is setuid root on activation
-        # Format: <type> <path> <mode> <uid> <gid> <age> <argument>
-        # 'f' creates a file and sets mode/owner; 'z' sets permissions on existing
-        "z /run/current-system/sw/share/tscbarcode/thermalprinterut 4755 root root - -"
-      ]
-    );
+    # Ensure the thermalprinterut helper is setuid root on activation. Use a
+    # plain list here to avoid relying on `lib.mkOptionList` which may not be
+    # available in certain evaluation contexts (previously caused "attribute
+    # 'mkOptionList' missing" during rebuild).
+    systemd.tmpfiles.rules = [
+      # Format: <type> <path> <mode> <uid> <gid> <age> <argument>
+      # 'z' sets permissions on an existing file
+      "z /run/current-system/sw/share/tscbarcode/thermalprinterut 4755 root root - -"
+    ];
   };
 
 }
