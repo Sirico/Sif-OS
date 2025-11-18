@@ -30,8 +30,6 @@
 
   # IPP Everywhere support (modern driverless printing)
   services.printing.webInterface = true;
-  # Share queues by default so downstream clients (e.g. Windows VMs) can discover them
-  services.printing.defaultShared = true;
 
   # Packages for printer management
   environment.systemPackages = with pkgs; [
@@ -40,6 +38,7 @@
 
   # Allow printers to be shared
   services.printing.browsing = true;
+  # Share queues by default so downstream clients (e.g. Windows VMs) can discover them
   services.printing.defaultShared = true;
 
   # Additional CUPS configuration for label printers

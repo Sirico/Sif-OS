@@ -9,7 +9,7 @@ in
 
   # Lightweight recovery profile: enable SSH, Tailscale (optional), and a local admin
   services.openssh.enable = true;
-  services.openssh.passwordAuthentication = false;
+  services.openssh.settings.PasswordAuthentication = false;
 
   # Minimal users: `recovery` user with sudo (no password) and an authorized key if provided
   users.users.recovery = {
