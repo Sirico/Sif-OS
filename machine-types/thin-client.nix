@@ -1,13 +1,12 @@
 # Thin Client Configuration Module
 # Minimal desktop for RDP/dispatch stations
 
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
   nix.settings.require-sigs = false;
 
   imports = [
-    ../modules/citizen-da210-cups-filter-pkg.nix
     ../modules/da210-setuid.nix
   ];
 
@@ -39,27 +38,17 @@
   # Essential thin client packages (registered as defaults so they merge cleanly
   # with other modules' package lists)
   environment.systemPackages = pkgs.lib.mkDefault (with pkgs; [
-    # RDP Client
     remmina
-    
-    # Utilities
     firefox
     vim
     wget
     curl
     htop
-    git  # Needed for self-update (admin only)
-    
-    # Network tools
+    git
     networkmanagerapplet
-    
-    # File manager
     gnome-console
     nautilus
-    # Add the DA-210 driver package (if driver files are placed in repo at files/da210)
-    # The package file `packages/da210-driver.nix` expects the driver files under `files/da210/`.
-    # If you have not added those files yet, the package will build but will be empty.
-    (import ../packages/da210-driver.nix { inherit pkgs; })
+    self.packages.${pkgs.system}.tsc-da210-barcode-driver
   ]);
 
   # Exclude unnecessary GNOME packages to save space

@@ -14,6 +14,7 @@
   outputs = { self, nixpkgs, ... } @ inputs:
     let
       system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
       
       # Common module imports for all SifOS machines
       commonModules = [
@@ -27,7 +28,7 @@
       mkSifOSSystem = hostname: machineType: extraModules:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit inputs; };
+          specialArgs = { inherit inputs self; };
           modules = commonModules ++ [
             ./configuration.nix
             machineType
@@ -38,6 +39,7 @@
         };
     in
     {
+      packages.x86_64-linux.tsc-da210-barcode-driver = import ./packages/da210-driver.nix { inherit pkgs; };
       # Machine configurations
       nixosConfigurations = {
         # Thin clients
