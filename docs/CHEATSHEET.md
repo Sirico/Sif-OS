@@ -81,6 +81,21 @@ git push
 ../scripts/deploy-fleet.sh -a
 ```
 
+## 🔁 Sync Config to Existing Machines
+
+Thin clients only see new settings after the repo has the change:
+
+1. **Edit + commit + push** from your workstation (as above).
+2. **On the thin client**:
+   ```bash
+   cd ~/sif-os
+   git pull          # pulls the commit you just pushed
+   sudo nixos-rebuild switch --flake .#thin-client-6
+   ```
+3. Verify the service (`systemctl status cups.service`, etc.).
+
+If nothing changed upstream, `git pull` does nothing and the rebuild keeps the old config—always push before asking remote machines to rebuild.
+
 ## 🔍 Check Machine Status
 
 ```bash

@@ -48,4 +48,7 @@
   # systemd still installs the upstream cups.socket unit from the cups
   # package, so explicitly disable it to avoid socket activation entirely.
   systemd.sockets.cups.enable = lib.mkForce false;
+
+  # Ensure the service no longer requires the (now-disabled) socket.
+  systemd.services.cups.unitConfig.Requires = lib.mkForce [ ];
 }
