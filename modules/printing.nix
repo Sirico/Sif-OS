@@ -1,12 +1,13 @@
 # Printing Configuration Module
 # CUPS and label printer support
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Enable CUPS and make sure all queues are discoverable on the LAN.
   services.printing = {
     enable = true;
+    startWhenNeeded = false;
     drivers = with pkgs; [
       # Common printer drivers
       gutenprint
@@ -22,7 +23,7 @@
     webInterface = true;
     defaultShared = true;
     browsing = true;
-    listenAddresses = [ "0.0.0.0:631" "[::]:631" ];
+    listenAddresses = [ "*:631" ];
     allowFrom = [ "all" ];
     extraConf = ''
       # Enable raw printing (useful for label printers) and force sharing.
@@ -43,4 +44,8 @@
   environment.systemPackages = with pkgs; [
     system-config-printer  # GUI printer configuration
   ];
+
+  # systemd still installs the upstream cups.socket unit from the cups
+  # package, so explicitly disable it to avoid socket activation entirely.
+  systemd.sockets.cups.enable = lib.mkForce false;
 }
