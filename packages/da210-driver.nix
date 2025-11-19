@@ -111,7 +111,7 @@ pkgs.stdenv.mkDerivation rec {
       if [ -f "$f" ]; then
         patchelf \
           --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
-          --set-rpath ${pkgs.cups}/lib:${pkgs.cups}/lib/cups:$ORIGIN \
+          --set-rpath ${pkgs.cups}/lib:${pkgs.cups}/lib/cups:\$ORIGIN \
           "$f" || true
       fi
     done
