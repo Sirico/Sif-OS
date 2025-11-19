@@ -9,6 +9,7 @@
   imports = [
     ../modules/da210-setuid.nix
     ../modules/da210-driver.nix
+    ../modules/printing-samba.nix
   ];
 
   # Enable RDP server for remote access to this thin client
@@ -52,6 +53,7 @@
 
   # Enable the DA-210 printer driver integration for thin clients
   sifos.printers.da210.enable = true;
+  sifos.printing.samba.enable = true;
 
   # Exclude unnecessary GNOME packages to save space
   environment.gnome.excludePackages = with pkgs; [
