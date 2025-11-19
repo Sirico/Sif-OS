@@ -1,13 +1,12 @@
 # Printing Configuration Module
 # CUPS and label printer support
 
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
   # Enable CUPS and make sure all queues are discoverable on the LAN.
   services.printing = {
     enable = true;
-    startWhenNeeded = false;
     drivers = with pkgs; [
       # Common printer drivers
       gutenprint
@@ -43,29 +42,5 @@
   # Packages for printer management
   environment.systemPackages = with pkgs; [
     system-config-printer  # GUI printer configuration
-  ];
-
-  # systemd still installs the upstream cups.socket unit from the cups
-  # package, so explicitly disable it to avoid socket activation entirely.
-  systemd.sockets.cups.enable = lib.mkForce false;
-
-  # Run cupsd as a normal service instead of socket-activated (-f keeps it in
-  # the foreground for systemd supervision).
-  systemd.services.cups = lib.mkMerge [
-    {
-      unitConfig = {
-        Requires = lib.mkForce [ ];
-        After = lib.mkForce [ "network.target" ];
-        Wants = lib.mkForce [ "network.target" ];
-      };
-      serviceConfig = lib.mkForce {
-        Type = "simple";
-        ExecStart = [
-          ""
-          "${config.services.printing.package}/sbin/cupsd -f"
-        ];
-      };
-      wantedBy = lib.mkForce [ "multi-user.target" "printer.target" ];
-    }
   ];
 }
