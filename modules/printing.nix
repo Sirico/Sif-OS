@@ -58,7 +58,10 @@
         After = lib.mkForce [ "network.target" ];
         Wants = lib.mkForce [ "network.target" ];
       };
-      serviceConfig.ExecStart = lib.mkForce "${config.services.printing.package}/sbin/cupsd -f";
+      serviceConfig = lib.mkForce {
+        Type = "simple";
+        ExecStart = "${config.services.printing.package}/sbin/cupsd -f";
+      };
       wantedBy = lib.mkForce [ "multi-user.target" "printer.target" ];
     }
   ];
