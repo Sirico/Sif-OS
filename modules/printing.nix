@@ -49,6 +49,17 @@
   # package, so explicitly disable it to avoid socket activation entirely.
   systemd.sockets.cups.enable = lib.mkForce false;
 
-  # Ensure the service no longer requires the (now-disabled) socket.
-  systemd.services.cups.unitConfig.Requires = lib.mkForce [ ];
+  # Run cupsd as a normal service instead of socket-activated (-f keeps it in
+  # the foreground for systemd supervision).
+  systemd.services.cups = lib.mkMerge [
+    {
+      unitConfig = {
+        Requires = lib.mkForce [ ];
+        After = lib.mkForce [ "network.target" ];
+        Wants = lib.mkForce [ "network.target" ];
+      };
+      serviceConfig.ExecStart = lib.mkForce "${config.services.printing.package}/sbin/cupsd -f";
+      wantedBy = lib.mkForce [ "multi-user.target" "printer.target" ];
+    }
+  ];
 }
