@@ -109,7 +109,10 @@ pkgs.stdenv.mkDerivation rec {
       "$out/lib/cups/backend/tscbarcodeusb"
     do
       if [ -f "$f" ]; then
-        patchelf --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} "$f" || true
+        patchelf \
+          --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
+          --set-rpath ${pkgs.cups}/lib:${pkgs.cups}/lib/cups:$ORIGIN \
+          "$f" || true
       fi
     done
 
