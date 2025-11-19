@@ -60,7 +60,10 @@
       };
       serviceConfig = lib.mkForce {
         Type = "simple";
-        ExecStart = "${config.services.printing.package}/sbin/cupsd -f";
+        ExecStart = [
+          ""
+          "${config.services.printing.package}/sbin/cupsd -f"
+        ];
       };
       wantedBy = lib.mkForce [ "multi-user.target" "printer.target" ];
     }
