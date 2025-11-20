@@ -15,6 +15,7 @@
 
       # Generic drivers
       cups-filters
+      libcupsfilters
 
       # Label printer support (Dymo, Brother, Zebra, etc.)
       # Add specific drivers as needed

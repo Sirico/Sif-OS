@@ -2,6 +2,12 @@
 
 let
   cfg = config.sifos.printing.samba;
+  cupsLdPath = lib.makeLibraryPath [
+    pkgs.cups
+    pkgs.cups.lib
+    pkgs.cups-filters
+    pkgs.libcupsfilters
+  ];
 in
 {
   options.sifos.printing.samba.enable = lib.mkEnableOption "Expose CUPS printers over Samba/SMB";
@@ -47,5 +53,14 @@ in
       "d /var/spool/samba 1777 root root -"
       "d /var/lib/samba/printers 1775 root root -"
     ];
+
+    # Ensure smbd/winbindd can dlopen libcups at runtime (needed for print
+    # shares). Keep the NSS path from the upstream module and append cups libs.
+    systemd.services."samba-smbd".environment.LD_LIBRARY_PATH =
+      lib.mkForce "${config.system.nssModules.path}:${cupsLdPath}";
+    systemd.services."samba-nmbd".environment.LD_LIBRARY_PATH =
+      lib.mkForce "${config.system.nssModules.path}:${cupsLdPath}";
+    systemd.services."samba-winbindd".environment.LD_LIBRARY_PATH =
+      lib.mkForce "${config.system.nssModules.path}:${cupsLdPath}";
   };
 }
