@@ -8,6 +8,8 @@ let
     pkgs.cups-filters
     pkgs.libcupsfilters
   ];
+  # NetBIOS names are limited to 15 chars; trim the hostName so smb.conf validates.
+  netbiosName = lib.substring 0 15 config.networking.hostName;
 in
 {
   options.sifos.printing.samba.enable = lib.mkEnableOption "Expose CUPS printers over Samba/SMB";
@@ -23,6 +25,7 @@ in
           "load printers" = "yes";
           printing = "cups";
           "printcap name" = "cups";
+          "netbios name" = netbiosName;
         };
         printers = {
           comment = "All Printers";
