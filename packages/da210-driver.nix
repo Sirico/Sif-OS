@@ -15,7 +15,8 @@ pkgs.stdenv.mkDerivation rec {
   src = ../.;
 
   nativeBuildInputs = [ pkgs.patchelf ];
-  propagatedBuildInputs = [ pkgs.cups ];
+  # Ensure libcups is in the runtime closure and available for dlopen.
+  propagatedBuildInputs = [ pkgs.cups pkgs.cups.lib ];
 
   installPhase = ''
 
@@ -118,7 +119,7 @@ pkgs.stdenv.mkDerivation rec {
       if [ -f "$f" ]; then
         patchelf \
           --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
-          --set-rpath ${pkgs.cups}/lib:${pkgs.cups}/lib/cups:\$ORIGIN \
+          --set-rpath ${pkgs.cups.lib}/lib:${pkgs.cups.lib}/lib/cups:${pkgs.cups}/lib/cups:\$ORIGIN \
           "$f" || true
       fi
     done
