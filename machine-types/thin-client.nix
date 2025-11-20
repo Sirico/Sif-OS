@@ -12,9 +12,8 @@
     ../modules/printing-samba.nix
   ];
 
-  # Allow VS Code Remote SSH server and support for non-Nix binaries it pulls in.
+  # Allow VS Code Remote SSH server binaries via nix-ld.
   programs.nix-ld.enable = true;
-  services.vscode-server.enable = true;
 
   # Enable RDP server for remote access to this thin client
   sifos.rdp.enable = true;
