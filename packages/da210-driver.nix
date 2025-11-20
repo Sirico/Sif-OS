@@ -14,7 +14,7 @@ pkgs.stdenv.mkDerivation rec {
   # repo root (parent directory of `packages/`)
   src = ../.;
 
-  buildInputs = [];
+  buildInputs = [ pkgs.patchelf ];
 
   installPhase = ''
 
@@ -100,6 +100,21 @@ pkgs.stdenv.mkDerivation rec {
     if [ -f "$bundle/crontest" ]; then
       install -D -m 0644 "$bundle/crontest" "$out/share/tscbarcode/crontest"
     fi
+
+    # Ensure vendor binaries have a valid interpreter on NixOS so cupsd can run
+    # them without hitting the stub loader.
+    for f in \
+      "$out/lib/cups/filter/rastertobarcodetspl" \
+      "$out/lib/cups/filter/rastertocls" \
+      "$out/lib/cups/backend/tscbarcodeusb"
+    do
+      if [ -f "$f" ]; then
+        patchelf \
+          --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
+          --set-rpath ${pkgs.cups}/lib:${pkgs.cups}/lib/cups:\$ORIGIN \
+          "$f" || true
+      fi
+    done
 
     # make everything readable
     chmod -R a+rX "$out"

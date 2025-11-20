@@ -81,6 +81,25 @@ git push
 ../scripts/deploy-fleet.sh -a
 ```
 
+## 🔁 Sync Config to Existing Machines
+
+Thin clients only see new settings after the repo has the change:
+
+1. **Edit + commit + push** from your workstation (as above).
+2. **On the thin client**:
+   ```bash
+   cd ~/sif-os
+   git pull          # pulls the commit you just pushed
+   sudo nixos-rebuild switch --flake .#thin-client-6
+   ```
+3. Verify the service (`systemctl status cups.service`, etc.).
+
+If nothing changed upstream, `git pull` does nothing and the rebuild keeps the old config—always push before asking remote machines to rebuild.
+
+### Windows/Samba fallback
+
+Thin clients now expose every CUPS queue over SMB. From Windows choose “Add printer” → “Select a shared printer by name” and enter the UNC path (e.g. `\\sifos-thin-client-6\dispatch-6-DA210`). When prompted, install the DA‑210 driver. This path works even if IPP filters are acting up.
+
 ## 🔍 Check Machine Status
 
 ```bash
