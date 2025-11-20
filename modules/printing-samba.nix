@@ -38,7 +38,6 @@ in
       isSystemUser = true;
       group = "lpadmins";
     };
-    services.samba.printers.enable = true;
     services.avahi.publish.enable = true;
   };
 }
