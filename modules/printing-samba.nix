@@ -23,7 +23,7 @@ in
           browseable = true;
           "guest ok" = true;
         };
-        print$ = {
+        "print$" = {
           comment = "Printer Drivers";
           path = "/var/lib/samba/printers";
           browseable = true;
