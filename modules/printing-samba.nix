@@ -11,24 +11,24 @@ in
       enable = true;
       openFirewall = true;
       settings = {
-        "load printers" = "yes";
-        printing = "cups";
-        "printcap name" = "cups";
-      };
-      shares = {
+        global = {
+          "load printers" = "yes";
+          printing = "cups";
+          "printcap name" = "cups";
+        };
         printers = {
           comment = "All Printers";
           path = "/var/spool/samba";
-          printable = true;
-          browseable = true;
-          "guest ok" = true;
+          printable = "yes";
+          browseable = "yes";
+          "guest ok" = "yes";
         };
         "print$" = {
           comment = "Printer Drivers";
           path = "/var/lib/samba/printers";
-          browseable = true;
-          "guest ok" = true;
-          writeable = false;
+          browseable = "yes";
+          "guest ok" = "yes";
+          writeable = "no";
         };
       };
     };
