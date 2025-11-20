@@ -10,11 +10,11 @@ in
     services.samba = {
       enable = true;
       openFirewall = true;
-      extraConfig = ''
-        load printers = yes
-        printing = cups
-        printcap name = cups
-      '';
+      settings = {
+        "load printers" = "yes";
+        printing = "cups";
+        "printcap name" = "cups";
+      };
       shares = {
         printers = {
           comment = "All Printers";
