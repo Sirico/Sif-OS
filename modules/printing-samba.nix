@@ -9,6 +9,8 @@ in
   config = lib.mkIf cfg.enable {
     services.samba = {
       enable = true;
+      # Use full build so CUPS printing is supported.
+      package = pkgs.sambaFull;
       openFirewall = true;
       settings = {
         global = {
@@ -39,5 +41,11 @@ in
       group = "lpadmins";
     };
     services.avahi.publish.enable = true;
+
+    # Ensure Samba printer share paths exist.
+    systemd.tmpfiles.rules = [
+      "d /var/spool/samba 1777 root root -"
+      "d /var/lib/samba/printers 1775 root root -"
+    ];
   };
 }
