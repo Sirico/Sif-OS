@@ -14,7 +14,7 @@ pkgs.stdenv.mkDerivation rec {
   # repo root (parent directory of `packages/`)
   src = ../.;
 
-  buildInputs = [ pkgs.patchelf ];
+  nativeBuildInputs = [ pkgs.patchelf ];
   propagatedBuildInputs = [ pkgs.cups ];
 
   installPhase = ''
@@ -102,11 +102,18 @@ pkgs.stdenv.mkDerivation rec {
       install -D -m 0644 "$bundle/crontest" "$out/share/tscbarcode/crontest"
     fi
 
+    # make everything readable
+    chmod -R a+rX "$out"
+  '';
+
+  postFixup = ''
     # Ensure vendor binaries can find libcups and the dynamic linker on NixOS.
     for f in \
       "$out/lib/cups/filter/rastertobarcodetspl" \
       "$out/lib/cups/filter/rastertocls" \
-      "$out/lib/cups/backend/tscbarcodeusb"
+      "$out/lib/cups/backend/tscbarcodeusb" \
+      "$out/lib/cups/backend/brusb" \
+      "$out/lib/cups/backend/brsocket"
     do
       if [ -f "$f" ]; then
         patchelf \
@@ -115,9 +122,6 @@ pkgs.stdenv.mkDerivation rec {
           "$f" || true
       fi
     done
-
-    # make everything readable
-    chmod -R a+rX "$out"
   '';
 
   meta = with pkgs.lib; {
