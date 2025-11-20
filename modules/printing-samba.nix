@@ -26,6 +26,10 @@ in
           printing = "cups";
           "printcap name" = "cups";
           "netbios name" = netbiosName;
+          "map to guest" = "Bad User";
+          "guest account" = "nobody";
+          "server min protocol" = "SMB2";
+          "ntlm auth" = "yes";
         };
         printers = {
           comment = "All Printers";
