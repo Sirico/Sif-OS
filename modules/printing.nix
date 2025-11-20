@@ -1,9 +1,13 @@
-# Printing Configuration Module
-# CUPS and label printer support
+{ pkgs, lib, ... }:
 
-{ pkgs, ... }:
-
-{
+let
+  cupsLdPath = lib.makeLibraryPath [
+    pkgs.cups
+    pkgs.cups.lib
+    pkgs.cups-filters
+    pkgs.libcupsfilters
+  ];
+in {
   # Enable CUPS and make sure all queues are discoverable on the LAN.
   services.printing = {
     enable = true;
@@ -32,6 +36,11 @@
       DefaultShared Yes
     '';
   };
+
+  # Ensure cupsd/cups-browsed can dlopen libcups/libcupsfilters when filters use
+  # their own dynamic loading logic.
+  systemd.services.cups.environment.LD_LIBRARY_PATH = lib.mkForce cupsLdPath;
+  systemd.services."cups-browsed".environment.LD_LIBRARY_PATH = lib.mkForce cupsLdPath;
 
   # Enable Avahi for network printer discovery
   services.avahi = {

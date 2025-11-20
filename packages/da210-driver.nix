@@ -108,6 +108,9 @@ pkgs.stdenv.mkDerivation rec {
   '';
 
   postFixup = ''
+    set -euo pipefail
+    cupsRpath="$out/lib/cups/filter:$out/lib/cups/backend:${pkgs.cups.lib}/lib:${pkgs.cups.lib}/lib/cups:${pkgs.cups}/lib/cups"
+
     # Ensure vendor binaries can find libcups and the dynamic linker on NixOS.
     for f in \
       "$out/lib/cups/filter/rastertobarcodetspl" \
@@ -116,12 +119,12 @@ pkgs.stdenv.mkDerivation rec {
       "$out/lib/cups/backend/brusb" \
       "$out/lib/cups/backend/brsocket"
     do
-      if [ -f "$f" ]; then
-        patchelf \
-          --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
-          --set-rpath ${pkgs.cups.lib}/lib:${pkgs.cups.lib}/lib/cups:${pkgs.cups}/lib/cups:\$ORIGIN \
-          "$f" || true
-      fi
+      [ -f "$f" ] || continue
+      patchelf \
+        --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} \
+        --force-rpath \
+        --set-rpath "$cupsRpath" \
+        "$f"
     done
   '';
 
